@@ -16,13 +16,39 @@ $location = isset($_GET['location']) ? trim($_GET['location']) : '';
 $job_type = isset($_GET['job_type']) ? trim($_GET['job_type']) : '';
 $company = isset($_GET['company']) ? trim($_GET['company']) : '';
 $date_posted = isset($_GET['date_posted']) ? trim($_GET['date_posted']) : '';
+$salary_range = isset($_GET['salary_range']) ? trim($_GET['salary_range']) : '';
 
-$jobs = getJobsWithFilters($koneksi, $keyword, $location, $job_type, $company, $date_posted);
+$salary_min = '';
+$salary_max = '';
+if (!empty($salary_range)) {
+    $range_parts = explode('-', $salary_range);
+    if (count($range_parts) == 2) {
+        $salary_min = trim($range_parts[0]);
+        $salary_max = trim($range_parts[1]);
+        if ($salary_max === 'max') $salary_max = '';
+    }
+}
+
+$jobs = getJobsWithFilters($koneksi, $keyword, $location, $job_type, $company, $date_posted, $salary_min, $salary_max);
 $jobs_json = json_encode($jobs);
 
 $listJobType = getAllJobTypes($koneksi);
 $listJobLocation = getAllJobLocation($koneksi);
 $listJobCompany = getAllCompanyName($koneksi);
+$salaryRanges = getSalaryRanges();
+
+$selectedSalaryLabel = '';
+if (!empty($salary_range)) {
+    foreach ($salaryRanges as $range) {
+        if (isset($range['min']) && isset($range['max'])) {
+            $rangeValue = $range['min'] . '-' . ($range['max'] ?: 'max');
+            if ($rangeValue === $salary_range) {
+                $selectedSalaryLabel = $range['label'];
+                break;
+            }
+        }
+    }
+}
 
 $searchStats = getSearchStats(count($jobs), $keyword, $location, $job_type, $company);
 ?>
@@ -112,6 +138,24 @@ $searchStats = getSearchStats(count($jobs), $keyword, $location, $job_type, $com
                                         <?php echo ($company === $comp['company_name']) ? 'selected' : ''; ?>>
                                     <?php echo htmlspecialchars($comp['company_name']); ?>
                                 </option>
+                            <?php endforeach; ?>
+                        </select>
+
+                        <select id="salary-range" 
+                                name="salary_range" 
+                                class="custom-select <?php echo !empty($salary_range) ? 'filter-active' : ''; ?>"
+                                onchange="applyFilters()">
+                            <option value="">Rentang Gaji</option>
+                            <?php foreach ($salaryRanges as $range): ?>
+                                <?php if (isset($range['min']) && isset($range['max'])): ?>
+                                    <?php 
+                                    $rangeValue = $range['min'] . '-' . ($range['max'] ?: 'max');
+                                    ?>
+                                    <option value="<?php echo $rangeValue; ?>"
+                                            <?php echo ($salary_range === $rangeValue) ? 'selected' : ''; ?>>
+                                        <?php echo htmlspecialchars($range['label']); ?>
+                                    </option>
+                                <?php endif; ?>
                             <?php endforeach; ?>
                         </select>
                         
