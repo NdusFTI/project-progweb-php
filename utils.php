@@ -1,5 +1,5 @@
 <?php
-function getJobsWithFilters($koneksi, $keyword = '', $location = '', $job_type = '', $company = '', $date_posted = '') {
+function getJobsWithFilters($koneksi, $keyword = '', $location = '', $job_type = '', $company = '', $date_posted = '', $salary_min = '', $salary_max = '') {
     $sql = "SELECT 
         jp.id,
         jp.title,
@@ -63,6 +63,22 @@ function getJobsWithFilters($koneksi, $keyword = '', $location = '', $job_type =
         $sql .= " AND DATE(jp.created_at) >= ?";
         $params[] = $date_posted;
         $types .= 's';
+    }
+
+    // Filter berdasarkan gaji minimum
+    if (!empty($salary_min)) {
+      $sql .= " AND (jp.salary_min >= ? OR jp.salary_max >= ?)";
+      $params[] = intval($salary_min);
+      $params[] = intval($salary_min);
+      $types .= 'ii';
+    }
+
+    // Filter berdasarkan gaji maksimum
+    if (!empty($salary_max)) {
+      $sql .= " AND (jp.salary_min <= ? OR jp.salary_max <= ?)";
+      $params[] = intval($salary_max);
+      $params[] = intval($salary_max);
+      $types .= 'ii';
     }
     
     $sql .= " ORDER BY jp.created_at DESC";
@@ -150,6 +166,18 @@ function getJobCategories($koneksi)
     return $result->fetch_all(MYSQLI_ASSOC);
 }
 
+function getSalaryRanges()
+{
+    return [
+        ['value' => '', 'label' => 'Semua Gaji'],
+        ['min' => 0, 'max' => 5000000, 'label' => 'Di bawah 5 Juta'],
+        ['min' => 5000000, 'max' => 10000000, 'label' => '5 - 10 Juta'],
+        ['min' => 10000000, 'max' => 15000000, 'label' => '10 - 15 Juta'],
+        ['min' => 15000000, 'max' => 20000000, 'label' => '15 - 20 Juta'],
+        ['min' => 20000000, 'max' => '', 'label' => 'Di atas 20 Juta']
+    ];
+}
+
 function highlightSearchTerm($text, $searchTerm) {
     if (empty($searchTerm)) {
         return htmlspecialchars($text);
@@ -166,6 +194,7 @@ function getSearchStats($totalJobs, $keyword = '', $location = '', $job_type = '
     if (!empty($location)) $filters[] = "lokasi: \"$location\"";
     if (!empty($job_type)) $filters[] = "tipe: \"$job_type\"";
     if (!empty($company)) $filters[] = "perusahaan: \"$company\"";
+    if (!empty($salary_range)) $filters[] = "gaji: \"$salary_range\"";
     
     $filterText = !empty($filters) ? ' dengan filter ' . implode(', ', $filters) : '';
     
