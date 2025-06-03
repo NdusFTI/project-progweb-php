@@ -50,10 +50,10 @@ $listJobCompany = getAllCompanyName($koneksi);
   <main>
     <section class="search-filter">
       <div class="search-wrap">
-        <form action="#" method="get">
+        <form action="search.php" method="get">
           <div class="input-wrap">
-            <input type="text" id="job-title" placeholder="Judul pekerjaan, kata kunci, atau perusahaan" />
-            <input type="text" id="location" placeholder="Kota, negara bagian, kode pos, atau 'remote'" />
+            <input type="text" name="keyword" id="job-title" placeholder="Judul pekerjaan, kata kunci, atau perusahaan" />
+            <input type="text" name="location" id="location" placeholder="Kota, negara bagian, kode pos, atau 'remote'" />
             <button type="submit">Cari</button>
           </div>
         </form>
