@@ -29,7 +29,7 @@ function getJobsWithFilters($koneksi, $keyword = '', $location = '', $job_type =
     $params = [];
     $types = '';
     
-    // Search by keyword (title, company name, category, description)
+    // Search berdasarkan kata koentji
     if (!empty($keyword)) {
         $sql .= " AND (jp.title LIKE ? OR c.company_name LIKE ? OR jcat.name LIKE ? OR jp.description LIKE ?)";
         $keyword_param = '%' . $keyword . '%';
@@ -37,28 +37,28 @@ function getJobsWithFilters($koneksi, $keyword = '', $location = '', $job_type =
         $types .= 'ssss';
     }
     
-    // Filter by location
+    // Filter berdasarkan lokasi
     if (!empty($location)) {
         $sql .= " AND jp.location LIKE ?";
         $params[] = '%' . $location . '%';
         $types .= 's';
     }
     
-    // Filter by job type
+    // Filter berdasarkan tipe pekerjaan
     if (!empty($job_type)) {
         $sql .= " AND jp.job_type LIKE ?";
         $params[] = '%' . $job_type . '%';
         $types .= 's';
     }
     
-    // Filter by company
+    // Filter berdasarkan nama perusahaan
     if (!empty($company)) {
         $sql .= " AND c.company_name LIKE ?";
         $params[] = '%' . $company . '%';
         $types .= 's';
     }
     
-    // Filter by date posted
+    // Filter berdasarkan tanggal
     if (!empty($date_posted)) {
         $sql .= " AND DATE(jp.created_at) >= ?";
         $params[] = $date_posted;

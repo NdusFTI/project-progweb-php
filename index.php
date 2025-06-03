@@ -79,7 +79,6 @@ $searchStats = getSearchStats(count($jobs), $keyword, $location, $job_type, $com
             
             <div class="filter-wrap">
                 <form action="" method="get" id="filter-form">
-                    <!-- Hidden inputs to preserve search terms -->
                     <input type="hidden" name="keyword" value="<?php echo htmlspecialchars($keyword); ?>">
                     <input type="hidden" name="location" value="<?php echo htmlspecialchars($location); ?>">
                     
@@ -225,21 +224,10 @@ $searchStats = getSearchStats(count($jobs), $keyword, $location, $job_type, $com
         </ul>
     </footer>
 
-    <script>
-        const jobsData = <?php echo $jobs_json; ?>;
-        
-        function applyFilters() {
-            document.getElementById('filter-form').submit();
-        }
-        
-        function applyLocationFilter() {
-            const locationFilter = document.getElementById('location-filter').value;
-            const locationInput = document.getElementById('location');
-            locationInput.value = locationFilter;
-            document.getElementById('search-form').submit();
-        }
+    <script id="jobs-data-json" type="application/json">
+      <?php echo $jobs_json; ?>
     </script>
+    <script src="Script/search.js"></script>
     <script src="Script/index.js"></script>
 </body>
-
 </html>
