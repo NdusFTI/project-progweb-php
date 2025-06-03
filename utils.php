@@ -11,6 +11,7 @@ $sql = "SELECT
   c.company_name,
   c.company_logo,
   c.company_banner,
+  c.city,
   jcat.name as category_name,
   jp.is_active,
   jp.created_at
@@ -58,5 +59,33 @@ function isPriority($created_at)
   $now = new DateTime();
   $diff = $now->diff($created_date);
   return $diff->days <= 3;
+}
+
+function getAllCompanyName($koneksi)
+{
+  $sql = "SELECT DISTINCT company_name FROM companies ORDER BY company_name ASC";
+  $stmt = $koneksi->prepare($sql);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+function getAllJobLocation($koneksi)
+{
+  $sql = "SELECT DISTINCT location FROM job_postings WHERE location IS NOT NULL AND location != '' ORDER BY location ASC";
+  $stmt = $koneksi->prepare($sql);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+function getAllJobTypes($koneksi)
+{
+  $sql = "SELECT DISTINCT job_type FROM job_postings WHERE job_type IS NOT NULL AND job_type != '' ORDER BY job_type ASC";
+  $stmt = $koneksi->prepare($sql);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $job_types = $result->fetch_all(MYSQLI_ASSOC);
+  return $job_types;
 }
 ?>

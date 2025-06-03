@@ -12,6 +12,10 @@ $username = $_SESSION['username'];
 $user_id = $_SESSION['user_id'];
 
 $jobs_json = json_encode($jobs);
+
+$listJobType = getAllJobTypes($koneksi);
+$listJobLocation = getAllJobLocation($koneksi);
+$listJobCompany = getAllCompanyName($koneksi);
 ?>
 
 <!DOCTYPE html>
@@ -59,15 +63,27 @@ $jobs_json = json_encode($jobs);
           <input type="date" id="date-posted" name="date_posted">
           <select id="job-type" class="custom-select">
             <option value="">Job Type</option>
-            <!-- TODO: From DB -->
+            <?php foreach ($listJobType as $type): ?>
+              <option value="<?php echo htmlspecialchars($type['job_type']); ?>">
+                <?php echo htmlspecialchars($type['job_type']); ?>
+              </option>
+            <?php endforeach; ?>
           </select>
           <select id="company" class="custom-select">
             <option value="">Company</option>
-            <!-- TODO: From DB -->
+            <?php foreach ($listJobCompany as $company): ?>
+              <option value="<?php echo htmlspecialchars($company['company_name']); ?>">
+                <?php echo htmlspecialchars($company['company_name']); ?>
+              </option>
+            <?php endforeach; ?>
           </select>
           <select id="location-filter" class="custom-select">
             <option value="">Location</option>
-            <!-- TODO: From DB -->
+            <?php foreach ($listJobLocation as $location): ?>
+              <option value="<?php echo htmlspecialchars($location['location']); ?>">
+                <?php echo htmlspecialchars($location['location']); ?>
+              </option>
+            <?php endforeach; ?>
           </select>
         </div>
       </div>
