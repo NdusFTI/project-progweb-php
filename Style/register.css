@@ -73,7 +73,6 @@ body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 1.5rem;
-  margin-bottom: 2rem;
 }
 
 .role-card {
@@ -94,7 +93,7 @@ body {
   background: white;
 }
 
-.role-card .selected {
+.role-card.selected {
   border-color: #13141a;
   background: #13141a;
   color: white;
@@ -113,4 +112,96 @@ body {
   margin: 0;
   opacity: 0.8;
   line-height: 1.4;
+}
+
+.role-card.selected p {
+  color: #fff;
+}
+
+.continue-btn {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background-color: #13141a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.continue-btn.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+#jobseeker,
+#company {
+  display: none;
+}
+
+.input-group {
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: #555;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.input-group input {
+  width: 100%;
+  padding: 1rem 1.25rem;
+  border: 2px solid #e1e5e9;
+  border-radius: 12px;
+  font-size: 1rem;
+  font-family: "Sora", sans-serif;
+  background: #f8f9fa;
+  transition: all 0.3s ease;
+  outline: none;
+}
+
+.input-group input:focus {
+  border-color: #13141a;
+  background: white;
+  box-shadow: 0 0 0 3px rgba(59, 65, 95, 0.4);
+  transform: translateY(-2px);
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 1rem 1.5rem;
+  background-color: #13141a;
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  font-family: "Sora", sans-serif;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 0.5rem;
+  margin-bottom: 1.5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(59, 65, 95, 0.4);
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
 }

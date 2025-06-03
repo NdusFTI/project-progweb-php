@@ -2,7 +2,29 @@
   require '../koneksi.php';
   session_start();
 
-  if ($_SERVER['REQUEST_METHOD'] == 'POST') {}
+  if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+
+    if (empty($username) || empty($password)) {
+      echo "<script>alert('Username dan password harus diisi!');</script>";
+    } else {
+      $stmt = $koneksi->prepare("SELECT * FROM users WHERE name = ? AND password = ?");
+      $stmt->bind_param("ss", $username, $password);
+      $stmt->execute();
+      $result = $stmt->get_result();
+
+      if ($result->num_rows > 0) {
+        $row = $result->fetch_assoc();
+        $_SESSION['user_id'] = $row['id'];
+        $_SESSION['username'] = $username;
+        header("Location: ../index.php");
+        exit();
+      } else {
+        echo "<script>alert('Username atau password salah!');</script>";
+      }
+    }
+  }
 ?>
 
 <!DOCTYPE html>
@@ -22,7 +44,7 @@
       <div class="login-section">
         <h2>Login</h2>
         <p><i>Login terlebih dahulu untuk mengakses fitur.</i></p>
-        <form action="login.php">
+        <form action="login.php" method="POST">
           <div class="input-group">
             <label for="username">Username</label>
             <input type="text" id="username" name="username" required>
