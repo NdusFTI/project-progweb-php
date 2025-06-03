@@ -73,12 +73,16 @@ function showJobDetail(index) {
             </div>
             <div class="type">
               <h1>Gaji</h1>
-              <p>${formatSalaryJS(job.salary_min, job.salary_max, job.salary_text)}</p>
+              <div class="tag">
+                <p>${formatSalaryJS(job.salary_min, job.salary_max, job.salary_text)}</p>
+              </div>
             </div>
             ${job.experience_required ? `
             <div class="type">
               <h1>Pengalaman</h1>
-              <p>${job.experience_required}</p>
+              <div class="tag">
+                <p>${job.experience_required}</p>
+              </div>
             </div>
             ` : ''}
           </div>
@@ -92,7 +96,9 @@ function showJobDetail(index) {
             ${job.application_deadline ? `
             <div class="type">
               <h1>Batas Lamaran</h1>
-              <p>${new Date(job.application_deadline).toLocaleDateString('id-ID')}</p>
+              <div class="tag">
+                <p>${new Date(job.application_deadline).toLocaleDateString('id-ID')}</p>
+              </div>
             </div>
             ` : ''}
           </div>
@@ -104,14 +110,6 @@ function showJobDetail(index) {
           <p>${job.description || 'Tidak ada deskripsi tersedia.'}</p>
         </div>
       </div>
-      ${job.requirements ? `
-      <div class="description">
-        <h1>Persyaratan</h1>
-        <div class="description-content">
-          <p>${job.requirements}</p>
-        </div>
-      </div>
-      ` : ''}
     </div>
   `;
 
