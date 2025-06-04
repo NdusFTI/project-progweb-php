@@ -10,6 +10,7 @@ if (!isset($_SESSION["user_id"])) {
 
 $username = $_SESSION["username"];
 $user_id = $_SESSION["user_id"];
+$role = $_SESSION["role"];
 
 $keyword = isset($_GET["keyword"]) ? trim($_GET["keyword"]) : "";
 $location = isset($_GET["location"]) ? trim($_GET["location"]) : "";
@@ -86,19 +87,22 @@ $salaryRanges = getSalaryRanges();
               value="<?php echo htmlspecialchars($keyword); ?>" />
             <input type="text" name="location" id="location" placeholder="Kota, negara bagian, kode pos, atau 'remote'"
               value="<?php echo htmlspecialchars($location); ?>" />
+
+            <!-- Hidden fields untuk mempertahankan filter yang sudah dipilih -->
+            <input type="hidden" name="job_type" value="<?php echo htmlspecialchars($job_type); ?>">
+            <input type="hidden" name="company" value="<?php echo htmlspecialchars($company); ?>">
+            <input type="hidden" name="date_posted" value="<?php echo htmlspecialchars($date_posted); ?>">
+            <input type="hidden" name="salary_range" value="<?php echo htmlspecialchars($salary_range); ?>">
+
             <button type="submit">Cari</button>
           </div>
         </form>
       </div>
       <div class="filter-wrap">
         <div class="filter-group">
-          <form action="index.php" method="GET" id="filter-form">
-            <input type="hidden" name="keyword" value="<?php echo htmlspecialchars(
-              $keyword
-            ); ?>">
-            <input type="hidden" name="location" value="<?php echo htmlspecialchars(
-              $location
-            ); ?>">
+          <form action="index.php" method="GET" id="filter-form"> <input type="hidden" name="keyword" value="<?php echo htmlspecialchars(
+            $keyword
+          ); ?>">
 
             <input type="date" id="date-posted" name="date_posted" value="<?php echo htmlspecialchars(
               $date_posted
@@ -114,9 +118,9 @@ $salaryRanges = getSalaryRanges();
                 <option value="<?php echo htmlspecialchars(
                   $type["job_type"]
                 ); ?>" <?php echo $job_type ===
-                   $type["job_type"]
-                   ? "selected"
-                   : ""; ?>>
+                    $type["job_type"]
+                    ? "selected"
+                    : ""; ?>>
                   <?php echo htmlspecialchars(
                     $type["job_type"]
                   ); ?>
@@ -132,9 +136,9 @@ $salaryRanges = getSalaryRanges();
                 <option value="<?php echo htmlspecialchars(
                   $comp["company_name"]
                 ); ?>" <?php echo $company ===
-                   $comp["company_name"]
-                   ? "selected"
-                   : ""; ?>>
+                    $comp["company_name"]
+                    ? "selected"
+                    : ""; ?>>
                   <?php echo htmlspecialchars(
                     $comp["company_name"]
                   ); ?>
@@ -158,9 +162,9 @@ $salaryRanges = getSalaryRanges();
                     "-" .
                     ($range["max"] ?: "max"); ?>
                   <option value="<?php echo $rangeValue; ?>" <?php echo $salary_range ===
-                       $rangeValue
-                       ? "selected"
-                       : ""; ?>>
+                        $rangeValue
+                        ? "selected"
+                        : ""; ?>>
                     <?php echo htmlspecialchars(
                       $range["label"]
                     ); ?>
@@ -169,12 +173,17 @@ $salaryRanges = getSalaryRanges();
               <?php endforeach; ?>
             </select>
 
-            <select id="location-filter" name="location_filter" class="custom-select" onchange="applyLocationFilter()">
+            <select id="location-filter" name="location" class="custom-select <?php echo !empty($location)
+              ? "filter-active"
+              : ""; ?>" onchange="applyFilters()">
               <option value="">Location</option>
               <?php foreach ($listJobLocation as $loc): ?>
                 <option value="<?php echo htmlspecialchars(
                   $loc["location"]
-                ); ?>">
+                ); ?>" <?php echo $location ===
+                    $loc["location"]
+                    ? "selected"
+                    : ""; ?>>
                   <?php echo htmlspecialchars(
                     $loc["location"]
                   ); ?>
@@ -182,7 +191,6 @@ $salaryRanges = getSalaryRanges();
               <?php endforeach; ?>
             </select>
           </form>
-
           <?php if (!empty($keyword) || !empty($location) || !empty($job_type) || !empty($company) || !empty($date_posted) || !empty($salary_range)): ?>
             <a href="index.php" class="clear-filters">Clear All Filters</a>
           <?php endif; ?>

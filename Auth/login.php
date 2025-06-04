@@ -18,6 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       $row = $result->fetch_assoc();
       $_SESSION['user_id'] = $row['id'];
       $_SESSION['username'] = $row['name'];
+      $_SESSION['role'] = $row['role'];
       header("Location: ../index.php");
       exit();
     } else {
