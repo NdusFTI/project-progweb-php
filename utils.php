@@ -1,4 +1,15 @@
 <?php
+
+function getCompanyByUserId($koneksi, $user_id)
+{
+  $sql = "SELECT * FROM companies WHERE user_id = ?";
+  $stmt = $koneksi->prepare($sql);
+  $stmt->bind_param("i", $user_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  return $result->fetch_assoc();
+}
+
 function getJobsWithFilters($koneksi, $keyword = '', $location = '', $job_type = '', $company = '', $date_posted = '', $salary_min = '', $salary_max = '')
 {
   $sql = "SELECT 

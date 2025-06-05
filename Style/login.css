@@ -96,7 +96,7 @@ body {
 }
 
 .input-group input:focus {
-  border-color: #13141a;
+  border-color: #2557a7;
   background: white;
   box-shadow: 0 0 0 3px rgba(59, 65, 95, 0.4);
   transform: translateY(-2px);
@@ -105,7 +105,7 @@ body {
 button[type="submit"] {
   width: 100%;
   padding: 1rem 1.5rem;
-  background-color: #13141a;
+  background-color: #2557a7;
   color: white;
   border: none;
   border-radius: 12px;
@@ -132,7 +132,7 @@ button[type="submit"]:disabled {
 }
 
 .login-section form > p a {
-  color: #13141a;
+  color: #2557a7;
   text-decoration: none;
   font-weight: 600;
   transition: all 0.3s ease;

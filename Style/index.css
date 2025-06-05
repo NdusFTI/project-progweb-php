@@ -576,6 +576,32 @@ body {
 }
 
 
+.dashboard-header {
+  background: linear-gradient(135deg, #2557a7 0%, #164081 100%);
+  color: white;
+  padding: 2rem 1rem;
+  text-align: center;
+}
+
+.dashboard-header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0 0 0.5rem 0;
+}
+
+.dashboard-header p {
+  font-size: 1rem;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.dashboard-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+
 footer {
   color: #2d2d2d;
   font-family: "IBM Plex Sans", sans-serif;
