@@ -1,5 +1,31 @@
 <?php
 
+function timeAgo($datetime)
+{
+  $time = time() - strtotime($datetime);
+
+  if ($time < 60)
+    return 'Just now';
+  if ($time < 3600)
+    return floor($time / 60) . ' minutes ago';
+  if ($time < 86400)
+    return floor($time / 3600) . ' hours ago';
+  if ($time < 2592000)
+    return floor($time / 86400) . ' days ago';
+
+  return date('M j, Y', strtotime($datetime));
+}
+
+function getApplicantCountClass($count)
+{
+  if ($count >= 20)
+    return 'high';
+  if ($count >= 10)
+    return 'medium';
+  return '';
+}
+
+// User
 function getCompanyByUserId($koneksi, $user_id)
 {
   $sql = "SELECT * FROM companies WHERE user_id = ?";
@@ -105,28 +131,6 @@ function getJobsWithFilters($koneksi, $keyword = '', $location = '', $job_type =
   return $result->fetch_all(MYSQLI_ASSOC);
 }
 
-function getTotalJobsByCompanyId($koneksi, $company_id)
-{
-  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ? AND is_active = 1";
-  $stmt = $koneksi->prepare($sql);
-  $stmt->bind_param("i", $company_id);
-  $stmt->execute();
-  $result = $stmt->get_result();
-  $row = $result->fetch_assoc();
-  return $row['total'];
-}
-
-function getRecentJobsCountById($koneksi, $company_id, $days = 7)
-{
-  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ? AND is_active = 1 AND created_at >= NOW() - INTERVAL ? DAY";
-  $stmt = $koneksi->prepare($sql);
-  $stmt->bind_param("ii", $company_id, $days);
-  $stmt->execute();
-  $result = $stmt->get_result();
-  $row = $result->fetch_assoc();
-  return $row['total'];
-}
-
 function formatSalary($salary_min, $salary_max, $salary_text)
 {
   if (!empty($salary_text)) {
@@ -200,5 +204,102 @@ function getSalaryRanges()
     ['min' => 15000000, 'max' => 20000000, 'label' => '15 - 20 Juta'],
     ['min' => 20000000, 'max' => '', 'label' => 'Di atas 20 Juta']
   ];
+}
+
+// Company Functions
+
+function getJobsByCompanyId($koneksi, $company_id)
+{
+  $sql = 'SELECT 
+      jp.id,
+      jp.title,
+      jp.salary_min,
+      jp.salary_max,
+      jp.salary_text,
+      jp.location,
+      jp.job_type,
+      jp.description,
+      jp.experience_required,
+      jp.application_deadline,
+      jp.views_count,
+      c.company_name,
+      c.company_logo,
+      c.company_banner,
+      c.city,
+      c.company_description,
+      jcat.name as category_name,
+      jp.is_active,
+      jp.created_at,
+      "active" as status,
+      (SELECT COUNT(*) FROM job_applications ja WHERE ja.job_id = jp.id) as applicant_count
+    FROM job_postings jp
+    JOIN companies c ON jp.company_id = c.id
+    JOIN job_categories jcat ON jp.category_id = jcat.id
+    WHERE jp.company_id = ? AND jp.is_active = 1
+    ORDER BY jp.created_at DESC';
+
+  $stmt = $koneksi->prepare($sql);
+  $stmt->bind_param("i", $company_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+
+  return $result->fetch_all(MYSQLI_ASSOC);
+}
+
+function getTotalJobsByCompanyId($koneksi, $company_id)
+{
+  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ? AND is_active = 1";
+  $stmt = $koneksi->prepare($sql);
+  $stmt->bind_param("i", $company_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  return $row['total'];
+}
+
+function getRecentJobsCountById($koneksi, $company_id, $days = 7)
+{
+  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ? AND is_active = 1 AND created_at >= NOW() - INTERVAL ? DAY";
+  $stmt = $koneksi->prepare($sql);
+  $stmt->bind_param("ii", $company_id, $days);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  return $row['total'];
+}
+
+function getActiveJobsCountById($koneksi, $company_id)
+{
+  $sql = 'SELECT COUNT(*) as total FROM job_postings WHERE company_id = ? AND is_active = 1';
+  $stmt = $koneksi->prepare($sql);
+  $stmt->bind_param("i", $company_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  return $row['total'];
+}
+
+function getTotalApplicantsByCompanyId($koneksi, $company_id)
+{
+  $sql = "SELECT COUNT(DISTINCT ja.applicant_id) as total FROM job_applications ja
+          JOIN job_postings jp ON ja.job_id = jp.id
+          WHERE jp.company_id = ? AND jp.is_active = 1";
+  $stmt = $koneksi->prepare($sql);
+  $stmt->bind_param("i", $company_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  return $row['total'];
+}
+
+function getTotalViewsByCompanyId($koneksi, $company_id)
+{
+  $sql = "SELECT SUM(views_count) as total FROM job_postings WHERE company_id = ? AND is_active = 1";
+  $stmt = $koneksi->prepare($sql);
+  $stmt->bind_param("i", $company_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  return $row['total'];
 }
 ?>

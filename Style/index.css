@@ -695,6 +695,204 @@ body {
   color: #6c757d;
 }
 
+.jobs-section {
+  background: white;
+  border: 1px solid #e4e2e0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+  padding: 1.5rem 2rem;
+  border-bottom: 1px solid #e4e2e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.section-header h2 {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0;
+  color: #2557a7;
+}
+
+.add-job-btn {
+  background: linear-gradient(135deg, #2557a7, #164081);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.add-job-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 87, 167, 0.3);
+}
+
+.jobs-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.jobs-table th,
+.jobs-table td {
+  text-align: left;
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e4e2e0;
+}
+
+.jobs-table th {
+  background-color: #f8f9fa;
+  font-weight: 600;
+  color: #495057;
+  font-size: 0.9rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.jobs-table tr:hover {
+  background-color: #f8f9fa;
+}
+
+.job-title {
+  font-weight: 600;
+  color: #2557a7;
+  margin: 0 0 0.25rem 0;
+}
+
+.job-company {
+  font-size: 0.85rem;
+  color: #666;
+  margin: 0;
+}
+
+.job-status {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-active {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-inactive {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-draft {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.applicant-count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  border-radius: 8px;
+  font-weight: 600;
+  color: #1976d2;
+}
+
+.applicant-count.high {
+  background: linear-gradient(135deg, #e8f5e8, #c8e6c9);
+  color: #2e7d32;
+}
+
+.applicant-count.medium {
+  background: linear-gradient(135deg, #fff8e1, #ffecb3);
+  color: #f57f17;
+}
+
+.job-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  padding: 0.5rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 0.8rem;
+}
+
+.action-btn.view {
+  background-color: #e3f2fd;
+  color: #1976d2;
+}
+
+.action-btn.edit {
+  background-color: #fff3e0;
+  color: #f57c00;
+}
+
+.action-btn.delete {
+  background-color: #ffebee;
+  color: #d32f2f;
+}
+
+.action-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.empty-state {
+  text-align: center;
+  padding: 3rem 2rem;
+  color: #666;
+}
+
+.empty-state img {
+  width: 120px;
+  height: 120px;
+  opacity: 0.5;
+  margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+  font-size: 1.25rem;
+  margin: 0 0 0.5rem 0;
+  color: #495057;
+}
+
+.empty-state p {
+  margin: 0 0 1.5rem 0;
+  font-size: 0.9rem;
+}
+
+.date-posted {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.empty-icon {
+  font-size: 4rem; 
+  opacity: 0.3; 
+  margin-bottom: 1rem;
+}
+
+
 footer {
   color: #2d2d2d;
   font-family: "IBM Plex Sans", sans-serif;

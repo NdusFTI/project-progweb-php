@@ -33,23 +33,27 @@ if (!empty($salary_range)) {
   }
 }
 
-$jobs = getJobsWithFilters(
-  $koneksi,
-  $keyword,
-  $location,
-  $job_type,
-  $company,
-  $date_posted,
-  $salary_min,
-  $salary_max
-);
-
 if ($_SESSION['role'] == 'company') {
   $companyData = getCompanyByUserId($koneksi, $user_id);
 
+  $jobs = getJobsByCompanyId($koneksi, $companyData['id']);
   $total_jobs = getTotalJobsByCompanyId($koneksi, $companyData['id']);
   $recent_jobs = getRecentJobsCountById($koneksi, $companyData['id']);
+  $active_jobs = getActiveJobsCountById($koneksi, $companyData['id']);
+  $total_applicants = getTotalApplicantsByCompanyId($koneksi, $companyData['id']);
+  $total_views = getTotalViewsByCompanyId($koneksi, $companyData['id']);
 } else {
+  $jobs = getJobsWithFilters(
+    $koneksi,
+    $keyword,
+    $location,
+    $job_type,
+    $company,
+    $date_posted,
+    $salary_min,
+    $salary_max
+  );
+
   $jobs_json = json_encode($jobs);
 
   $listJobType = getAllJobTypes($koneksi);
@@ -106,222 +110,345 @@ if ($_SESSION['role'] == 'company') {
   </header>
   <main>
     <?php if ($_SESSION['role'] == 'job_seeker'): ?>
-      <div class="jobseeker">
-        <section class="search-filter">
-          <div class="search-wrap">
-            <form action="index.php" method="GET" id="search-form">
-              <div class="input-wrap">
-                <input type="text" name="keyword" id="job-title"
-                  placeholder="Judul pekerjaan, kata kunci, atau perusahaan"
-                  value="<?php echo htmlspecialchars($keyword); ?>" />
-                <input type="text" name="location" id="location"
-                  placeholder="Kota, negara bagian, kode pos, atau 'remote'"
-                  value="<?php echo htmlspecialchars($location); ?>" />
+      <section class="search-filter">
+        <div class="search-wrap">
+          <form action="index.php" method="GET" id="search-form">
+            <div class="input-wrap">
+              <input type="text" name="keyword" id="job-title" placeholder="Judul pekerjaan, kata kunci, atau perusahaan"
+                value="<?php echo htmlspecialchars($keyword); ?>" />
+              <input type="text" name="location" id="location" placeholder="Kota, negara bagian, kode pos, atau 'remote'"
+                value="<?php echo htmlspecialchars($location); ?>" />
 
-                <input type="hidden" name="job_type" value="<?php echo htmlspecialchars($job_type); ?>">
-                <input type="hidden" name="company" value="<?php echo htmlspecialchars($company); ?>">
-                <input type="hidden" name="date_posted" value="<?php echo htmlspecialchars($date_posted); ?>">
-                <input type="hidden" name="salary_range" value="<?php echo htmlspecialchars($salary_range); ?>">
+              <input type="hidden" name="job_type" value="<?php echo htmlspecialchars($job_type); ?>">
+              <input type="hidden" name="company" value="<?php echo htmlspecialchars($company); ?>">
+              <input type="hidden" name="date_posted" value="<?php echo htmlspecialchars($date_posted); ?>">
+              <input type="hidden" name="salary_range" value="<?php echo htmlspecialchars($salary_range); ?>">
 
-                <button type="submit">Cari</button>
-              </div>
-            </form>
-          </div>
-          <div class="filter-wrap">
-            <div class="filter-group">
-              <form action="index.php" method="GET" id="filter-form"> <input type="hidden" name="keyword" value="<?php echo htmlspecialchars(
-                $keyword
-              ); ?>">
+              <button type="submit">Cari</button>
+            </div>
+          </form>
+        </div>
+        <div class="filter-wrap">
+          <div class="filter-group">
+            <form action="index.php" method="GET" id="filter-form"> <input type="hidden" name="keyword" value="<?php echo htmlspecialchars(
+              $keyword
+            ); ?>">
 
-                <input type="date" id="date-posted" name="date_posted" value="<?php echo htmlspecialchars(
-                  $date_posted
-                ); ?>" onchange="applyFilters()">
+              <input type="date" id="date-posted" name="date_posted" value="<?php echo htmlspecialchars(
+                $date_posted
+              ); ?>" onchange="applyFilters()">
 
-                <select id="job-type" name="job_type" class="custom-select <?php echo !empty(
-                  $job_type
-                )
-                  ? "filter-active"
-                  : ""; ?>" onchange="applyFilters()">
-                  <option value="">Job Type</option>
-                  <?php foreach ($listJobType as $type): ?>
-                    <option value="<?php echo htmlspecialchars(
+              <select id="job-type" name="job_type" class="custom-select <?php echo !empty(
+                $job_type
+              )
+                ? "filter-active"
+                : ""; ?>" onchange="applyFilters()">
+                <option value="">Job Type</option>
+                <?php foreach ($listJobType as $type): ?>
+                  <option value="<?php echo htmlspecialchars(
+                    $type["job_type"]
+                  ); ?>" <?php echo $job_type ===
+                     $type["job_type"]
+                     ? "selected"
+                     : ""; ?>>
+                    <?php echo htmlspecialchars(
                       $type["job_type"]
-                    ); ?>" <?php echo $job_type ===
-                       $type["job_type"]
-                       ? "selected"
-                       : ""; ?>>
-                      <?php echo htmlspecialchars(
-                        $type["job_type"]
-                      ); ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
+                    ); ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
 
-                <select id="company" name="company" class="custom-select <?php echo !empty($company)
-                  ? "filter-active"
-                  : ""; ?>" onchange="applyFilters()">
-                  <option value="">Company</option>
-                  <?php foreach ($listJobCompany as $comp): ?>
-                    <option value="<?php echo htmlspecialchars(
+              <select id="company" name="company" class="custom-select <?php echo !empty($company)
+                ? "filter-active"
+                : ""; ?>" onchange="applyFilters()">
+                <option value="">Company</option>
+                <?php foreach ($listJobCompany as $comp): ?>
+                  <option value="<?php echo htmlspecialchars(
+                    $comp["company_name"]
+                  ); ?>" <?php echo $company ===
+                     $comp["company_name"]
+                     ? "selected"
+                     : ""; ?>>
+                    <?php echo htmlspecialchars(
                       $comp["company_name"]
-                    ); ?>" <?php echo $company ===
-                       $comp["company_name"]
-                       ? "selected"
-                       : ""; ?>>
+                    ); ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
+
+              <select id="salary-range" name="salary_range" class="custom-select <?php echo !empty(
+                $salary_range
+              )
+                ? "filter-active"
+                : ""; ?>" onchange="applyFilters()">
+                <option value="">Salary</option>
+                <?php foreach ($salaryRanges as $range): ?>
+                  <?php if (
+                    isset($range["min"]) &&
+                    isset($range["max"])
+                  ): ?>
+                    <?php $rangeValue =
+                      $range["min"] .
+                      "-" .
+                      ($range["max"] ?: "max"); ?>
+                    <option value="<?php echo $rangeValue; ?>" <?php echo $salary_range ===
+                         $rangeValue
+                         ? "selected"
+                         : ""; ?>>
                       <?php echo htmlspecialchars(
-                        $comp["company_name"]
+                        $range["label"]
                       ); ?>
                     </option>
-                  <?php endforeach; ?>
-                </select>
+                  <?php endif; ?>
+                <?php endforeach; ?>
+              </select>
 
-                <select id="salary-range" name="salary_range" class="custom-select <?php echo !empty(
-                  $salary_range
-                )
-                  ? "filter-active"
-                  : ""; ?>" onchange="applyFilters()">
-                  <option value="">Salary</option>
-                  <?php foreach ($salaryRanges as $range): ?>
-                    <?php if (
-                      isset($range["min"]) &&
-                      isset($range["max"])
-                    ): ?>
-                      <?php $rangeValue =
-                        $range["min"] .
-                        "-" .
-                        ($range["max"] ?: "max"); ?>
-                      <option value="<?php echo $rangeValue; ?>" <?php echo $salary_range ===
-                           $rangeValue
-                           ? "selected"
-                           : ""; ?>>
-                        <?php echo htmlspecialchars(
-                          $range["label"]
-                        ); ?>
-                      </option>
-                    <?php endif; ?>
-                  <?php endforeach; ?>
-                </select>
-
-                <select id="location-filter" name="location" class="custom-select <?php echo !empty($location)
-                  ? "filter-active"
-                  : ""; ?>" onchange="applyFilters()">
-                  <option value="">Location</option>
-                  <?php foreach ($listJobLocation as $loc): ?>
-                    <option value="<?php echo htmlspecialchars(
+              <select id="location-filter" name="location" class="custom-select <?php echo !empty($location)
+                ? "filter-active"
+                : ""; ?>" onchange="applyFilters()">
+                <option value="">Location</option>
+                <?php foreach ($listJobLocation as $loc): ?>
+                  <option value="<?php echo htmlspecialchars(
+                    $loc["location"]
+                  ); ?>" <?php echo $location ===
+                     $loc["location"]
+                     ? "selected"
+                     : ""; ?>>
+                    <?php echo htmlspecialchars(
                       $loc["location"]
-                    ); ?>" <?php echo $location ===
-                       $loc["location"]
-                       ? "selected"
-                       : ""; ?>>
-                      <?php echo htmlspecialchars(
-                        $loc["location"]
-                      ); ?>
-                    </option>
-                  <?php endforeach; ?>
-                </select>
-              </form>
-              <?php if (!empty($keyword) || !empty($location) || !empty($job_type) || !empty($company) || !empty($date_posted) || !empty($salary_range)): ?>
-                <a href="index.php" class="clear-filters">Clear All Filters</a>
-              <?php endif; ?>
+                    ); ?>
+                  </option>
+                <?php endforeach; ?>
+              </select>
+            </form>
+            <?php if (!empty($keyword) || !empty($location) || !empty($job_type) || !empty($company) || !empty($date_posted) || !empty($salary_range)): ?>
+              <a href="index.php" class="clear-filters">Clear All Filters</a>
+            <?php endif; ?>
+          </div>
+        </div>
+      </section>
+
+      <section class="breadcrumb">
+        <p><a href="index.php" class="active">Home</a></p>
+      </section>
+
+      <section class="job-list">
+        <section class="job-wrap">
+          <div class="scroll-content">
+            <p class="info">Yang tersedia saat ini.</p>
+            <?php foreach ($jobs as $index => $job): ?>
+              <div class="job-item" data-job-index="<?php echo $index; ?>" onclick="showJobDetail(<?php echo $index; ?>)">
+                <?php if (isPriority($job["created_at"])): ?>
+                  <div class="priority">
+                    <p>Dicari!</p>
+                  </div>
+                <?php endif; ?>
+
+                <div class="title">
+                  <h2><?php echo htmlspecialchars($job["title"]); ?></h2>
+                </div>
+
+                <div class="company">
+                  <p>
+                    <?php echo htmlspecialchars($job["company_name"]); ?> <br />
+                    <?php echo htmlspecialchars($job["location"]); ?>
+                  </p>
+                </div>
+
+                <div class="info">
+                  <p><?php echo formatSalary(
+                    $job["salary_min"],
+                    $job["salary_max"],
+                    $job["salary_text"]
+                  ); ?>
+                  </p>
+                  <p><?php echo formatJobType($job["job_type"]); ?></p>
+                  <p><?php echo htmlspecialchars($job["category_name"]); ?></p>
+                </div>
+              </div>
+            <?php endforeach; ?>
+
+            <?php if (empty($jobs)): ?>
+              <div class="job-item">
+                <p>Belum ada lowongan kerja yang tersedia.</p>
+              </div>
+            <?php endif; ?>
+          </div>
+          <div class="static-info">
+            <div class="job-detail" id="job-detail-container">
+              <div class="empty-state" id="empty-state">
+                <p>Pilih lowongan kerja untuk melihat detail</p>
+              </div>
             </div>
           </div>
         </section>
-
-        <section class="breadcrumb">
-          <p><a href="index.php" class="active">Home</a></p>
-        </section>
-
-        <section class="job-list">
-          <section class="job-wrap">
-            <div class="scroll-content">
-              <p class="info">Yang tersedia saat ini.</p>
-              <?php foreach ($jobs as $index => $job): ?>
-                <div class="job-item" data-job-index="<?php echo $index; ?>" onclick="showJobDetail(<?php echo $index; ?>)">
-                  <?php if (isPriority($job["created_at"])): ?>
-                    <div class="priority">
-                      <p>Dicari!</p>
-                    </div>
-                  <?php endif; ?>
-
-                  <div class="title">
-                    <h2><?php echo htmlspecialchars($job["title"]); ?></h2>
-                  </div>
-
-                  <div class="company">
-                    <p>
-                      <?php echo htmlspecialchars($job["company_name"]); ?> <br />
-                      <?php echo htmlspecialchars($job["location"]); ?>
-                    </p>
-                  </div>
-
-                  <div class="info">
-                    <p><?php echo formatSalary(
-                      $job["salary_min"],
-                      $job["salary_max"],
-                      $job["salary_text"]
-                    ); ?>
-                    </p>
-                    <p><?php echo formatJobType($job["job_type"]); ?></p>
-                    <p><?php echo htmlspecialchars($job["category_name"]); ?></p>
-                  </div>
-                </div>
-              <?php endforeach; ?>
-
-              <?php if (empty($jobs)): ?>
-                <div class="job-item">
-                  <p>Belum ada lowongan kerja yang tersedia.</p>
-                </div>
-              <?php endif; ?>
-            </div>
-            <div class="static-info">
-              <div class="job-detail" id="job-detail-container">
-                <div class="empty-state" id="empty-state">
-                  <p>Pilih lowongan kerja untuk melihat detail</p>
-                </div>
-              </div>
-            </div>
-          </section>
-        </section>
-      </div>
+      </section>
     <?php endif; ?>
     <?php if ($_SESSION['role'] == 'company'): ?>
-      <div class="company">
-        <div class="dashboard-header">
-          <h1>Employer Dashboard</h1>
-          <p>Kelola lowongan pekerjaan Anda dan lacak lamaran untuk
-            <?php echo htmlspecialchars($companyData['company_name']); ?>
-          </p>
-        </div>
+      <div class="dashboard-header">
+        <h1>Employer Dashboard</h1>
+        <p>Kelola lowongan pekerjaan Anda dan lacak lamaran untuk
+          <?php echo htmlspecialchars($companyData['company_name']); ?>
+        </p>
+      </div>
 
-        <section class="breadcrumb">
-          <p><a href="index.php" class="active">Dashboard</a></p>
-        </section>
+      <section class="breadcrumb">
+        <p><a href="index.php" class="active">Dashboard</a></p>
+      </section>
 
-        <div class="dashboard-content">
-          <div class="stats-grid">
-            <div class="stat-card">
-              <div class="stat-card-header">
-                <div class="stat-icon jobs">
-                  <i class="fas fa-briefcase"></i>
+      <div class="dashboard-content">
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-icon jobs">
+                <i class="fas fa-briefcase"></i>
+              </div>
+              <div>
+                <h3>Total Jobs Posted</h3>
+                <div class="stat-number"><?php echo $total_jobs; ?></div>
+                <div class="stat-change <?php echo $recent_jobs > 0 ? 'positive' : 'neutral'; ?>">
+                  <?php if ($recent_jobs > 0): ?>
+                    <i class="fas fa-arrow-up"></i>
+                    <?php echo $recent_jobs; ?> this month
+                  <?php else: ?>
+                    <i class="fas fa-minus"></i>
+                    No new jobs this month
+                  <?php endif; ?>
                 </div>
-                <div>
-                  <h3>Total Jobs Posted</h3>
-                  <div class="stat-number"><?php echo $total_jobs; ?></div>
-                  <div class="stat-change <?php echo $recent_jobs > 0 ? 'positive' : 'neutral'; ?>">
-                    <?php if ($recent_jobs > 0): ?>
-                      <i class="fas fa-arrow-up"></i>
-                      <?php echo $recent_jobs; ?> this month
-                    <?php else: ?>
-                      <i class="fas fa-minus"></i>
-                      No new jobs this month
-                    <?php endif; ?>
-                  </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-icon active">
+                <i class="fas fa-play-circle"></i>
+              </div>
+              <div>
+                <h3>Active Jobs</h3>
+                <div class="stat-number"><?php echo $active_jobs; ?></div>
+                <div class="stat-change neutral">
+                  <i class="fas fa-info-circle"></i>
+                  Currently accepting applications
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-icon applicants">
+                <i class="fas fa-users"></i>
+              </div>
+              <div>
+                <h3>Total Applicants</h3>
+                <div class="stat-number"><?php echo $total_applicants; ?></div>
+                <div class="stat-change <?php echo $total_applicants > 0 ? 'positive' : 'neutral'; ?>">
+                  <i class="fas fa-user-plus"></i>
+                  Across all job postings
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="stat-card">
+            <div class="stat-card-header">
+              <div class="stat-icon views">
+                <i class="fas fa-eye"></i>
+              </div>
+              <div>
+                <h3>Total Views</h3>
+                <div class="stat-number"><?php echo number_format($total_views); ?></div>
+                <div class="stat-change neutral">
+                  <i class="fas fa-chart-line"></i>
+                  Job listing impressions
                 </div>
               </div>
             </div>
           </div>
         </div>
-      <?php endif; ?>
+
+        <div class="jobs-section">
+          <div class="section-header">
+            <h2><i class="fas fa-list"></i> Your Job Postings</h2>
+            <a href="Company/addjob.php" class="add-job-btn">
+              <i class="fas fa-plus"></i>
+              Post New Job
+            </a>
+          </div>
+
+          <?php if (!empty($jobs)): ?>
+            <table class="jobs-table">
+              <thead>
+                <tr>
+                  <th>Job Title</th>
+                  <th>Category</th>
+                  <th>Salary</th>
+                  <th>Applicants</th>
+                  <th>Status</th>
+                  <th>Posted</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($jobs as $job): ?>
+                  <tr>
+                    <td>
+                      <div class="job-title"><?php echo htmlspecialchars($job['title']); ?></div>
+                      <div class="job-company"><?php echo formatJobType($job['job_type']); ?> •
+                        <?php echo htmlspecialchars($job['location']); ?>
+                      </div>
+                    </td>
+                    <td><?php echo htmlspecialchars($job['category_name']); ?></td>
+                    <td><?php echo formatSalary($job['salary_min'], $job['salary_max'], $job['salary_text']); ?></td>
+                    <td>
+                      <div class="applicant-count <?php echo getApplicantCountClass($job['applicant_count']); ?>">
+                        <i class="fas fa-user"></i>
+                        <?php echo $job['applicant_count']; ?> applicant<?php echo $job['applicant_count'] != 1 ? 's' : ''; ?>
+                      </div>
+                    </td>
+                    <td>
+                      <span class="job-status status-<?php echo $job['status']; ?>">
+                        <?php echo ucfirst($job['status']); ?>
+                      </span>
+                    </td>
+                    <td>
+                      <div class="date-posted"><?php echo timeAgo($job['created_at']); ?></div>
+                    </td>
+                    <td>
+                      <div class="job-actions">
+                        <button class="action-btn view" title="View Applications"
+                          onclick="viewApplications(<?php echo $job['id']; ?>)">
+                          <i class="fas fa-eye"></i>
+                        </button>
+                        <button class="action-btn edit" title="Edit Job" onclick="editJob(<?php echo $job['id']; ?>)">
+                          <i class="fas fa-edit"></i>
+                        </button>
+                        <button class="action-btn delete" title="Delete Job" onclick="deleteJob(<?php echo $job['id']; ?>)">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                <?php endforeach; ?>
+              </tbody>
+            </table>
+          <?php else: ?>
+            <div class="empty-state">
+              <div style="font-size: 4rem; opacity: 0.3; margin-bottom: 1rem;">
+                <i class="fas fa-briefcase"></i>
+              </div>
+              <h3>No Job Postings Yet</h3>
+              <p>Start by posting your first job to attract talented candidates.</p>
+              <a href="add-job.php" class="add-job-btn">
+                <i class="fas fa-plus"></i>
+                Post Your First Job
+              </a>
+            </div>
+          <?php endif; ?>
+        </div>
+      </div>
+    <?php endif; ?>
   </main>
   <footer>
     <div class="logo">

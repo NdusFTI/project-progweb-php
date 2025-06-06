@@ -1,5 +1,15 @@
 let selectedJobIndex = null;
 
+function editJob(index) {
+  window.location.href = `Company/editjob.php?id=${index}`
+}
+
+function deleteJob(index) {
+  if (confirm("Apakah Anda yakin ingin menghapus pekerjaan ini?")) {
+    window.location.href = `Company/deletejob.php?id=${index}`;
+  }
+}
+
 function formatSalaryJS(salaryMin, salaryMax, salaryText) {
   if (salaryText && salaryText.trim() !== '') {
     return salaryText;
