@@ -105,6 +105,28 @@ function getJobsWithFilters($koneksi, $keyword = '', $location = '', $job_type =
   return $result->fetch_all(MYSQLI_ASSOC);
 }
 
+function getTotalJobsByCompanyId($koneksi, $company_id)
+{
+  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ? AND is_active = 1";
+  $stmt = $koneksi->prepare($sql);
+  $stmt->bind_param("i", $company_id);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  return $row['total'];
+}
+
+function getRecentJobsCountById($koneksi, $company_id, $days = 7)
+{
+  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ? AND is_active = 1 AND created_at >= NOW() - INTERVAL ? DAY";
+  $stmt = $koneksi->prepare($sql);
+  $stmt->bind_param("ii", $company_id, $days);
+  $stmt->execute();
+  $result = $stmt->get_result();
+  $row = $result->fetch_assoc();
+  return $row['total'];
+}
+
 function formatSalary($salary_min, $salary_max, $salary_text)
 {
   if (!empty($salary_text)) {

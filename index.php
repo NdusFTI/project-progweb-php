@@ -46,14 +46,18 @@ $jobs = getJobsWithFilters(
 
 if ($_SESSION['role'] == 'company') {
   $companyData = getCompanyByUserId($koneksi, $user_id);
+
+  $total_jobs = getTotalJobsByCompanyId($koneksi, $companyData['id']);
+  $recent_jobs = getRecentJobsCountById($koneksi, $companyData['id']);
+} else {
+  $jobs_json = json_encode($jobs);
+
+  $listJobType = getAllJobTypes($koneksi);
+  $listJobLocation = getAllJobLocation($koneksi);
+  $listJobCompany = getAllCompanyName($koneksi);
+  $salaryRanges = getSalaryRanges();
 }
 
-$jobs_json = json_encode($jobs);
-
-$listJobType = getAllJobTypes($koneksi);
-$listJobLocation = getAllJobLocation($koneksi);
-$listJobCompany = getAllCompanyName($koneksi);
-$salaryRanges = getSalaryRanges();
 ?>
 
 <!DOCTYPE html>
@@ -89,7 +93,13 @@ $salaryRanges = getSalaryRanges();
       </div>
       <div class="navbar-user">
         <span class="navbar-welcome">Welcome,</span>
-        <span class="navbar-username"><?php echo $firstName; ?></span>
+        <?php if ($_SESSION['role'] == 'job_seeker'): ?>
+          <span class="navbar-username"><?php echo $firstName; ?></span>
+        <?php endif; ?>
+
+        <?php if ($_SESSION['role'] == 'company'): ?>
+          <span class="navbar-username"><?php echo htmlspecialchars($companyData['company_name']); ?></span>
+        <?php endif; ?>
         <a href="Auth/logout.php" class="navbar-signout">Sign Out</a>
       </div>
     </nav>
@@ -108,7 +118,6 @@ $salaryRanges = getSalaryRanges();
                   placeholder="Kota, negara bagian, kode pos, atau 'remote'"
                   value="<?php echo htmlspecialchars($location); ?>" />
 
-                <!-- Hidden fields untuk mempertahankan filter yang sudah dipilih -->
                 <input type="hidden" name="job_type" value="<?php echo htmlspecialchars($job_type); ?>">
                 <input type="hidden" name="company" value="<?php echo htmlspecialchars($company); ?>">
                 <input type="hidden" name="date_posted" value="<?php echo htmlspecialchars($date_posted); ?>">
@@ -289,9 +298,30 @@ $salaryRanges = getSalaryRanges();
         </section>
 
         <div class="dashboard-content">
+          <div class="stats-grid">
+            <div class="stat-card">
+              <div class="stat-card-header">
+                <div class="stat-icon jobs">
+                  <i class="fas fa-briefcase"></i>
+                </div>
+                <div>
+                  <h3>Total Jobs Posted</h3>
+                  <div class="stat-number"><?php echo $total_jobs; ?></div>
+                  <div class="stat-change <?php echo $recent_jobs > 0 ? 'positive' : 'neutral'; ?>">
+                    <?php if ($recent_jobs > 0): ?>
+                      <i class="fas fa-arrow-up"></i>
+                      <?php echo $recent_jobs; ?> this month
+                    <?php else: ?>
+                      <i class="fas fa-minus"></i>
+                      No new jobs this month
+                    <?php endif; ?>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-      </div>
-    <?php endif; ?>
+      <?php endif; ?>
   </main>
   <footer>
     <div class="logo">
