@@ -80,7 +80,7 @@ if ($_SESSION['role'] == 'company') {
     <nav class="navbar">
       <div class="navbar-left">
         <div class="navbar-logo">
-          <img src="Asset/logo.png" alt="SugoiJob Logo" width="32" height="32">
+          <img src="asset/logo.png" alt="SugoiJob Logo" width="32" height="32">
           <h2 class="navbar-brand">SugoiJob</h2>
         </div>
         <ul class="navbar-links">
@@ -400,7 +400,9 @@ if ($_SESSION['role'] == 'company') {
                       </div>
                     </td>
                     <td><?php echo htmlspecialchars($job['category_name']); ?></td>
-                    <td class="job-salary"><?php echo formatSalary($job['salary_min'], $job['salary_max'], $job['salary_text']); ?></td>
+                    <td class="job-salary">
+                      <?php echo formatSalary($job['salary_min'], $job['salary_max'], $job['salary_text']); ?>
+                    </td>
                     <td>
                       <div class="applicant-count <?php echo getApplicantCountClass($job['applicant_count']); ?>">
                         <i class="fas fa-user"></i>
@@ -452,20 +454,20 @@ if ($_SESSION['role'] == 'company') {
   </main>
   <footer>
     <div class="logo">
-      <img src="Asset/logo.png" alt="SugoiJob Logo" width="36" />
+      <img src="asset/logo.png" alt="SugoiJob Logo" width="36" />
       <span>SugoiJob © <span id="currentYear"></span>. All rights reserved.</span>
     </div>
     <ul>
       <li>
-        <img src="Asset/instagram.png" />
+        <img src="asset/instagram.png" />
         <a href="https://www.instagram.com/kncrln_/" target="_blank">Kenzie</a>
       </li>
       <li>
-        <img src="Asset/instagram.png" />
+        <img src="asset/instagram.png" />
         <a href="https://www.instagram.com/r.van83/" target="_blank">Ivan</a>
       </li>
       <li>
-        <img src="Asset/instagram.png" />
+        <img src="asset/instagram.png" />
         <a href="https://www.instagram.com/ndusft/" target="_blank">Bernadus</a>
       </li>
     </ul>

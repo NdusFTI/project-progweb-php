@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <body>
   <div class="container">
     <div class="logo-section">
-      <img src="../Asset/logo.png" alt="SugoiJob Logo" width="42" height="42">
+      <img src="../asset/logo.png" alt="SugoiJob Logo" width="42" height="42">
       <h1>SugoiJob</h1>
     </div>
     <div class="register-section">
