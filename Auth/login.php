@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       $_SESSION['user_id'] = $row['id'];
       $_SESSION['username'] = $row['name'];
       $_SESSION['role'] = $row['role'];
-      header("Location: .");
+      header("Location: /");
       exit();
     } else {
       echo "<script>alert('Email atau password salah!');</script>";
