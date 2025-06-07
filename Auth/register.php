@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SugoiJob - Registration</title>
-  <link rel="stylesheet" href="../Style/register.css">
+  <link rel="stylesheet" href="../style/register.css">
 </head>
 
 <body>
@@ -104,7 +104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
       </div>
     </div>
   </div>
-  <script src="../Script/register.js"></script>
+  <script src="../script/register.js"></script>
 </body>
 
 </html>

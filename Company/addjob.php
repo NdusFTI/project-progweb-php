@@ -10,7 +10,7 @@ require "../koneksi.php";
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SugoiJob - Add Jobs</title>
-  <link rel="stylesheet" href="../Style/jobs.css">
+  <link rel="stylesheet" href="../style/jobs.css">
 </head>
 
 <body>

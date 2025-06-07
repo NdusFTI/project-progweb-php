@@ -1,12 +1,12 @@
 let selectedJobIndex = null;
 
 function editJob(index) {
-  window.location.href = `Company/editjob.php?id=${index}`
+  window.location.href = `company/editjob.php?id=${index}`
 }
 
 function deleteJob(index) {
   if (confirm("Apakah Anda yakin ingin menghapus pekerjaan ini?")) {
-    window.location.href = `Company/deletejob.php?id=${index}`;
+    window.location.href = `company/deletejob.php?id=${index}`;
   }
 }
 

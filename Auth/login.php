@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
       $_SESSION['user_id'] = $row['id'];
       $_SESSION['username'] = $row['name'];
       $_SESSION['role'] = $row['role'];
-      header("Location: ../index.php");
+      header("Location: .");
       exit();
     } else {
       echo "<script>alert('Email atau password salah!');</script>";
@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SugoiJob - Authentikasi</title>
-  <link rel="stylesheet" href="../Style/login.css">
+  <link rel="stylesheet" href="../style/login.css">
 </head>
 
 <body>

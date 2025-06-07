@@ -18,7 +18,7 @@ if (!empty($job_id)) {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SugoiJob - Delete Jobs</title>
-  <link rel="stylesheet" href="../Style/jobs.css">
+  <link rel="stylesheet" href="../style/jobs.css">
   <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 
@@ -31,7 +31,7 @@ if (!empty($job_id)) {
         text: 'ID pekerjaan tidak valid!',
         confirmButtonColor: '#d33'
       }).then(() => {
-        window.location.href = '../index.php';
+        window.location.href = '/';
       });
     </script>
   <?php else: ?>
@@ -43,7 +43,7 @@ if (!empty($job_id)) {
           text: 'Pekerjaan berhasil dihapus!',
           confirmButtonColor: '#28a745'
         }).then(() => {
-          window.location.href = '../index.php';
+          window.location.href = '/';
         });
       <?php else: ?>
         Swal.fire({
@@ -52,7 +52,7 @@ if (!empty($job_id)) {
           text: 'Gagal menghapus pekerjaan: <?php echo mysqli_error($koneksi); ?>',
           confirmButtonColor: '#d33'
         }).then(() => {
-          window.location.href = '../index.php';
+          window.location.href = '/';
         });
       <?php endif; ?>
     </script>

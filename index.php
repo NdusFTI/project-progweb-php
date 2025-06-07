@@ -4,7 +4,7 @@ include "utils.php";
 session_start();
 
 if (!isset($_SESSION["user_id"])) {
-  header("Location: Auth/login.php");
+  header("Location: auth/login.php");
   exit();
 }
 
@@ -71,7 +71,7 @@ if ($_SESSION['role'] == 'company') {
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SugoiJob - Dashboard</title>
-  <link rel="stylesheet" href="Style/index.css">
+  <link rel="stylesheet" href="style/index.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -85,13 +85,13 @@ if ($_SESSION['role'] == 'company') {
         </div>
         <ul class="navbar-links">
           <?php if ($_SESSION['role'] == 'job_seeker'): ?>
-            <li><a href="index.php" class="navbar-link active">Home</a></li>
+            <li><a href="/" class="navbar-link active">Home</a></li>
             <li><a href="Jobseeker/profile.php" class="navbar-link">Profile</a></li>
           <?php endif; ?>
           <?php if ($_SESSION['role'] == 'company'): ?>
-            <li><a href="index.php" class="navbar-link active">Dashboard</a></li>
-            <li><a href="Company/manage-jobs.php" class="navbar-link">Manage Jobs</a></li>
-            <li><a href="Company/application.php" class="navbar-link">Applications</a></li>
+            <li><a href="/" class="navbar-link active">Dashboard</a></li>
+            <li><a href="company/manage-jobs.php" class="navbar-link">Manage Jobs</a></li>
+            <li><a href="company/application.php" class="navbar-link">Applications</a></li>
           <?php endif; ?>
         </ul>
       </div>
@@ -104,7 +104,7 @@ if ($_SESSION['role'] == 'company') {
         <?php if ($_SESSION['role'] == 'company'): ?>
           <span class="navbar-username"><?php echo htmlspecialchars($companyData['company_name']); ?></span>
         <?php endif; ?>
-        <a href="Auth/logout.php" class="navbar-signout">Sign Out</a>
+        <a href="auth/logout.php" class="navbar-signout">Sign Out</a>
       </div>
     </nav>
   </header>
@@ -112,7 +112,7 @@ if ($_SESSION['role'] == 'company') {
     <?php if ($_SESSION['role'] == 'job_seeker'): ?>
       <section class="search-filter">
         <div class="search-wrap">
-          <form action="index.php" method="GET" id="search-form">
+          <form action="/" method="GET" id="search-form">
             <div class="input-wrap">
               <input type="text" name="keyword" id="job-title" placeholder="Judul pekerjaan, kata kunci, atau perusahaan"
                 value="<?php echo htmlspecialchars($keyword); ?>" />
@@ -130,7 +130,7 @@ if ($_SESSION['role'] == 'company') {
         </div>
         <div class="filter-wrap">
           <div class="filter-group">
-            <form action="index.php" method="GET" id="filter-form"> <input type="hidden" name="keyword" value="<?php echo htmlspecialchars(
+            <form action="/" method="GET" id="filter-form"> <input type="hidden" name="keyword" value="<?php echo htmlspecialchars(
               $keyword
             ); ?>">
 
@@ -222,14 +222,14 @@ if ($_SESSION['role'] == 'company') {
               </select>
             </form>
             <?php if (!empty($keyword) || !empty($location) || !empty($job_type) || !empty($company) || !empty($date_posted) || !empty($salary_range)): ?>
-              <a href="index.php" class="clear-filters">Clear All Filters</a>
+              <a href="/" class="clear-filters">Clear All Filters</a>
             <?php endif; ?>
           </div>
         </div>
       </section>
 
       <section class="breadcrumb">
-        <p><a href="index.php" class="active">Home</a></p>
+        <p><a href="/" class="active">Home</a></p>
       </section>
 
       <section class="job-list">
@@ -293,7 +293,7 @@ if ($_SESSION['role'] == 'company') {
       </div>
 
       <section class="breadcrumb">
-        <p><a href="index.php" class="active">Dashboard</a></p>
+        <p><a href="/" class="active">Dashboard</a></p>
       </section>
 
       <div class="dashboard-content">
@@ -371,7 +371,7 @@ if ($_SESSION['role'] == 'company') {
         <div class="jobs-section">
           <div class="section-header">
             <h2><i class="fas fa-list"></i> Your Job Postings</h2>
-            <a href="Company/addjob.php" class="add-job-btn">
+            <a href="company/addjob.php" class="add-job-btn">
               <i class="fas fa-plus"></i>
               Post New Job
             </a>
@@ -400,7 +400,7 @@ if ($_SESSION['role'] == 'company') {
                       </div>
                     </td>
                     <td><?php echo htmlspecialchars($job['category_name']); ?></td>
-                    <td><?php echo formatSalary($job['salary_min'], $job['salary_max'], $job['salary_text']); ?></td>
+                    <td class="job-salary"><?php echo formatSalary($job['salary_min'], $job['salary_max'], $job['salary_text']); ?></td>
                     <td>
                       <div class="applicant-count <?php echo getApplicantCountClass($job['applicant_count']); ?>">
                         <i class="fas fa-user"></i>
@@ -474,8 +474,8 @@ if ($_SESSION['role'] == 'company') {
   <script id="jobs-data-json" type="application/json">
     <?php echo $jobs_json; ?>
   </script>
-  <script src="Script/search.js"></script>
-  <script src="Script/index.js"></script>
+  <script src="script/search.js"></script>
+  <script src="script/index.js"></script>
 </body>
 
 </html>
