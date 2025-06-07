@@ -1,5 +1,10 @@
 let selectedJobIndex = null;
 
+function viewApplications(index) {
+  console.log(`Viewing applications for job index: ${index}`);
+  window.location.href = `jobs/detail.php?id=${index}`;
+}
+
 function editJob(index) {
   window.location.href = `company/editjob.php?id=${index}`
 }
@@ -60,7 +65,7 @@ function showJobDetail(index) {
         </div>
       </div>
       <div class="apply">
-        <a href="detail.php?id=${job.id}">
+        <a href="jobs/detail.php?id=${job.id}">
           View More
           <svg xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" width="24" height="24" viewBox="0 0 24 24">
             <path d="M19,21H5c-1.1,0-2-0.9-2-2V5c0-1.1,0.9-2,2-2h7v2H5v14h14v-7h2v7C21,20.1,20.1,21,19,21z"></path>
@@ -134,12 +139,14 @@ function showJobDetail(index) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-  if (jobsData.length > 0) {
-    showJobDetail(0);
-  }
-
-  const yearElement = document.getElementById('currentYear');
-  if (yearElement) {
-    yearElement.textContent = new Date().getFullYear();
+  if (jobsData || Array.isArray(jobsData)) {
+    if (jobsData.length > 0) {
+      showJobDetail(0);
+    }
+  
+    const yearElement = document.getElementById('currentYear');
+    if (yearElement) {
+      yearElement.textContent = new Date().getFullYear();
+    }
   }
 });

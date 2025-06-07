@@ -90,8 +90,7 @@ if ($_SESSION['role'] == 'company') {
           <?php endif; ?>
           <?php if ($_SESSION['role'] == 'company'): ?>
             <li><a href="/" class="navbar-link active">Dashboard</a></li>
-            <li><a href="company/manage-jobs.php" class="navbar-link">Manage Jobs</a></li>
-            <li><a href="company/application.php" class="navbar-link">Applications</a></li>
+            <li><a href="company/profile.php" class="navbar-link">Profile</a></li>
           <?php endif; ?>
         </ul>
       </div>
@@ -410,8 +409,9 @@ if ($_SESSION['role'] == 'company') {
                       </div>
                     </td>
                     <td>
-                      <span class="job-status status-<?php echo $job['status']; ?>">
-                        <?php echo ucfirst($job['status']); ?>
+                      <span
+                        class="job-status status-<?php echo $job['is_active'] == 1 ? 'active' : ($job['is_active'] == 2 ? 'draft' : 'inactive'); ?>">
+                        <?php echo $job['is_active'] == 1 ? 'Active' : ($job['is_active'] == 2 ? 'Draft' : 'Inactive'); ?>
                       </span>
                     </td>
                     <td>
@@ -473,10 +473,12 @@ if ($_SESSION['role'] == 'company') {
     </ul>
   </footer>
 
-  <script id="jobs-data-json" type="application/json">
-    <?php echo $jobs_json; ?>
-  </script>
-  <script src="script/search.js"></script>
+  <?php if ($_SESSION['role'] == 'job_seeker'): ?>
+    <script id="jobs-data-json" type="application/json">
+      <?php echo $jobs_json; ?>
+    </script>
+    <script src="script/search.js"></script>
+  <?php endif; ?>
   <script src="script/index.js"></script>
 </body>
 

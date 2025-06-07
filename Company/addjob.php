@@ -1,6 +1,121 @@
 <?php
 require "../koneksi.php";
 
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+  $job_title = trim($_POST['job_title']);
+  $category = trim($_POST['category']);
+  $job_type = $_POST['job_type'];
+  $location = trim($_POST['location']);
+  $full_address = trim($_POST['full_address']);
+  $salary_min = $_POST['salary_min'];
+  $salary_max = $_POST['salary_max'];
+  $description = trim($_POST['description']);
+  $requirements = trim($_POST['requirements']);
+  $experience_required = trim($_POST['experience_required']);
+  $status = $_POST['status'];
+  $application_deadline = $_POST['application_deadline'];
+
+  $errors = [];
+
+  // Validasi
+  if (empty($job_title))
+    $errors[] = "Job title required";
+
+  if (empty($category)) {
+    $errors[] = "Category required";
+  } else {
+    $check_cat = $koneksi->prepare("SELECT id FROM job_categories WHERE name = ?");
+    $check_cat->bind_param("s", $category);
+    $check_cat->execute();
+    $result = $check_cat->get_result();
+
+    if ($result->num_rows > 0) {
+      $cat_data = $result->fetch_assoc();
+      $category_id = $cat_data['id'];
+    } else {
+      $insert_cat = $koneksi->prepare("INSERT INTO job_categories (name) VALUES (?)");
+      $insert_cat->bind_param("s", $category);
+      $insert_cat->execute();
+      $category_id = $koneksi->insert_id;
+    }
+  }
+
+  if (empty($job_type))
+    $errors[] = "Job type required";
+  elseif (!in_array($job_type, ['Full-Time', 'Part-Time', 'Kontrak', 'Internship']))
+    $errors[] = "Invalid job type selected";
+
+  if (empty($description))
+    $errors[] = "Description required";
+  if (empty($requirements))
+    $errors[] = "Requirements required";
+  if (empty($location))
+    $errors[] = "Location required";
+  if (empty($full_address))
+    $errors[] = "Full address required";
+
+  if (!is_numeric($salary_min) || $salary_min < 0)
+    $errors[] = "Minimum salary must be a non-negative number";
+  if (!is_numeric($salary_max) || $salary_max < 0)
+    $errors[] = "Maximum salary must be a non-negative number";
+  if ($salary_min > $salary_max)
+    $errors[] = "Minimum salary cannot be greater than maximum salary";
+
+  if (empty($application_deadline))
+    $errors[] = "Application deadline required";
+  if (!DateTime::createFromFormat('Y-m-d', $application_deadline))
+    $errors[] = "Invalid application deadline format";
+  if (strtotime($application_deadline) < strtotime(date('Y-m-d')))
+    $errors[] = "Application deadline cannot be in the past";
+
+  if (!in_array($status, ['active', 'draft', 'paused']))
+    $errors[] = "Invalid status";
+
+  if (empty($errors)) {
+    $sql = "INSERT INTO job_postings (company_id, category_id, title, description, requirements, salary_min, salary_max, salary_text, location, full_address, job_type, experience_required, application_deadline, is_active) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $koneksi->prepare($sql);
+    $company_id = $_SESSION['company_id'] ?? 1;
+
+    $status_value = ($status == 'active') ? 1 : (($status == 'draft') ? 2 : 0);
+    $salary_text = "Rp " . number_format($salary_min, 0, ',', '.') . " - Rp " . number_format($salary_max, 0, ',', '.');
+    $experience_required = empty($experience_required) ? null : $experience_required;
+
+    $stmt->bind_param(
+      "iissssissssssi",
+      $company_id,
+      $category_id,
+      $job_title,
+      $description,
+      $requirements,
+      $salary_min,
+      $salary_max,
+      $salary_text,
+      $location,
+      $full_address,
+      $job_type,
+      $experience_required,
+      $application_deadline,
+      $status_value
+    );
+
+    if ($stmt->execute()) {
+      echo "<script>
+        alert('Success! Job posting created successfully!');
+        window.location.href = '../';
+      </script>";
+    } else {
+      echo "<script>
+        alert('Error! Failed to create job posting. Please try again.');
+      </script>";
+    }
+  } else {
+    $error_text = implode('\\n', $errors);
+    echo "<script>
+      alert('Validation Error!\\n$error_text');
+    </script>";
+  }
+}
 ?>
 
 <!DOCTYPE html>
@@ -11,6 +126,7 @@ require "../koneksi.php";
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>SugoiJob - Add Jobs</title>
   <link rel="stylesheet" href="../style/jobs.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
@@ -21,7 +137,7 @@ require "../koneksi.php";
     </div>
 
     <div class="form-content">
-      <form action="process-job.php" method="POST" id="job-form">
+      <form action="addjob.php" method="POST" id="job-form">
         <div class="form-grid">
 
           <!-- Ini Job Title -->
@@ -42,14 +158,28 @@ require "../koneksi.php";
 
             <div class="form-group">
               <label for="job_type">Job Type <span class="required">*</span></label>
-              <input type="text" id="job_type" name="job_type" required placeholder="Enter your job type here" />
+              <select id="job_type" name="job_type" required>
+                <option value="">Select Job Type</option>
+                <option value="Full-Time">Full-Time</option>
+                <option value="Part-Time">Part-Time</option>
+                <option value="Kontrak">Kontrak</option>
+                <option value="Internship">Internship</option>
+              </select>
             </div>
           </div>
 
           <!-- Ini Location -->
-          <div class="form-group">
-            <label for="location">Location <span class="required">*</span></label>
-            <input type="text" id="location" name="location" required placeholder="Enter your job location here" />
+          <div class="form-row">
+            <div class="form-group">
+              <label for="location">Location <span class="required">*</span></label>
+              <input type="text" id="location" name="location" required placeholder="Enter your job location here" />
+            </div>
+
+            <div class="form-group">
+              <label for="full_address">Full Address <span class="required">*</span></label>
+              <input type="text" id="full_address" name="full_address" required
+                placeholder="Enter your full address here" />
+            </div>
           </div>
 
           <!-- Ini Salary Information -->
@@ -80,18 +210,11 @@ require "../koneksi.php";
               placeholder="Daftar keterampilan, pengalaman, dan kualifikasi penting yang dibutuhkan untuk pekerjaan ini..."></textarea>
           </div>
 
-          <!-- Ini Benefits -->
+          <!-- Ini Experience Required -->
           <div class="form-group">
-            <label for="benefits">Benefits & Perks</label>
-            <textarea id="benefits" name="benefits"
-              placeholder="Benefit yang bisa didapatkan jika mengambil pekerjaan ini..."></textarea>
-          </div>
-
-          <!-- Ini Application Instructions -->
-          <div class="form-group">
-            <label for="application_instructions">Application Instructions</label>
-            <textarea id="application_instructions" name="application_instructions"
-              placeholder="Instruksi khusus untuk pelamar (persyaratan portofolio, dll)..."></textarea>
+            <label for="experience_required">Experience Required</label>
+            <input type="text" id="experience_required" name="experience_required"
+              placeholder="Experience yang dibutuhkan..." />
           </div>
 
           <!-- Ini Job Status & Deadline -->
@@ -109,7 +232,7 @@ require "../koneksi.php";
               <label for="application_deadline">Application Deadline <span class="required">*</span></label>
               <input type="date" id="application_deadline" name="application_deadline" required />
               <div class="help-text">
-                <i>Set a deadline for applications</i>
+                <i>Tetapkan tenggat waktu untuk aplikasi</i>
               </div>
             </div>
           </div>
@@ -127,8 +250,6 @@ require "../koneksi.php";
       </form>
     </div>
   </div>
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/js/all.min.js"></script>
 </body>
 
 </html>

@@ -235,7 +235,7 @@ function getJobsByCompanyId($koneksi, $company_id)
     FROM job_postings jp
     JOIN companies c ON jp.company_id = c.id
     JOIN job_categories jcat ON jp.category_id = jcat.id
-    WHERE jp.company_id = ? AND jp.is_active = 1
+    WHERE jp.company_id = ?
     ORDER BY jp.created_at DESC';
 
   $stmt = $koneksi->prepare($sql);
@@ -248,7 +248,7 @@ function getJobsByCompanyId($koneksi, $company_id)
 
 function getTotalJobsByCompanyId($koneksi, $company_id)
 {
-  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ? AND is_active = 1";
+  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ?";
   $stmt = $koneksi->prepare($sql);
   $stmt->bind_param("i", $company_id);
   $stmt->execute();
@@ -259,7 +259,7 @@ function getTotalJobsByCompanyId($koneksi, $company_id)
 
 function getRecentJobsCountById($koneksi, $company_id, $days = 7)
 {
-  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ? AND is_active = 1 AND created_at >= NOW() - INTERVAL ? DAY";
+  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ? AND created_at >= NOW() - INTERVAL ? DAY";
   $stmt = $koneksi->prepare($sql);
   $stmt->bind_param("ii", $company_id, $days);
   $stmt->execute();

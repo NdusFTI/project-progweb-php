@@ -13,7 +13,7 @@ body {
 
 .form-container {
   max-width: 800px;
-  margin: 0 auto;
+  margin: 2rem auto;
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -21,7 +21,7 @@ body {
 }
 
 .form-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2557a7 0%, #164081 100%);
   color: white;
   padding: 2rem;
   text-align: center;
@@ -147,7 +147,7 @@ body {
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: linear-gradient(135deg, #2557a7 0%, #164081 100%);
   color: white;
 }
 
@@ -175,22 +175,4 @@ body {
   font-size: 0.875rem;
   color: #718096;
   margin-top: 0.25rem;
-}
-
-@media (max-width: 768px) {
-  .form-row {
-      grid-template-columns: 1fr;
-  }
-  
-  .salary-inputs {
-      grid-template-columns: 1fr;
-  }
-  
-  .salary-separator {
-      display: none;
-  }
-  
-  .form-actions {
-      flex-direction: column;
-  }
 }
