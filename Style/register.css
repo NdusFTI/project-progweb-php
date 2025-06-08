@@ -87,15 +87,15 @@ body {
 }
 
 .role-card:hover {
-  border-color: #13141a;
+  border-color: #2557a7;
   transform: translateY(-4px);
   box-shadow: 0 8px 25px rgba(19, 20, 26, 0.15);
   background: white;
 }
 
 .role-card.selected {
-  border-color: #13141a;
-  background: #13141a;
+  border-color: #2557a7;
+  background: #2557a7;
   color: white;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(19, 20, 26, 0.3);
@@ -121,7 +121,7 @@ body {
 .continue-btn {
   width: 100%;
   padding: 1rem 1.5rem;
-  background-color: #13141a;
+  background-color: #2557a7;
   color: white;
   border: none;
   border-radius: 12px;
@@ -171,7 +171,7 @@ body {
 }
 
 .input-group input:focus {
-  border-color: #13141a;
+  border-color: #2557a7;
   background: white;
   box-shadow: 0 0 0 3px rgba(59, 65, 95, 0.4);
   transform: translateY(-2px);
@@ -180,7 +180,7 @@ body {
 button[type="submit"] {
   width: 100%;
   padding: 1rem 1.5rem;
-  background-color: #13141a;
+  background-color: #2557a7;
   color: white;
   border: none;
   border-radius: 12px;
