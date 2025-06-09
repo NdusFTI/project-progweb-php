@@ -1,12 +1,14 @@
 <?php
 require '../koneksi.php';
+include '../utils.php';
 session_start();
 
-$username = $_SESSION["username"];
-$user_id = $_SESSION["user_id"];
-$role = $_SESSION["role"];
+$isLoggedIn = isset($_SESSION["user_id"]);
+$username = $isLoggedIn ? $_SESSION["username"] : "Guest";
+$user_id = $isLoggedIn ? $_SESSION["user_id"] : null;
+$role = $isLoggedIn ? $_SESSION["role"] : "job_seeker";
 
-$firstName = explode(" ", $username)[0];
+$firstName = $isLoggedIn ? explode(" ", $username)[0] : "Guest";
 
 if (!isset($_GET['id'])) {
   header('Location: ../');
@@ -14,17 +16,7 @@ if (!isset($_GET['id'])) {
 }
 
 $id = $_GET['id'];
-
-$query = "SELECT jp.*, c.*, jc.name as category_name 
-FROM job_postings jp 
-INNER JOIN companies c ON jp.company_id = c.id 
-INNER JOIN job_categories jc ON jp.category_id = jc.id 
-WHERE jp.id = ?";
-
-$stmt = mysqli_prepare($koneksi, $query);
-mysqli_stmt_bind_param($stmt, "i", $id);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
+$result = getDetailJobs($koneksi, $id);
 
 if (mysqli_num_rows($result) > 0) {
   $job = mysqli_fetch_assoc($result);
@@ -47,6 +39,7 @@ if (mysqli_num_rows($result) > 0) {
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>SugoiJob - <?php echo $job["title"] . " - " . $job["company_name"]; ?></title>
   <link rel="stylesheet" href="../style/detail.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
 <body>
@@ -58,29 +51,34 @@ if (mysqli_num_rows($result) > 0) {
           <h2 class="navbar-brand">SugoiJob</h2>
         </div>
         <ul class="navbar-links">
-          <?php if ($_SESSION['role'] == 'job_seeker'): ?>
+          <?php if (!$isLoggedIn || $role == 'job_seeker'): ?>
             <li><a href="/" class="navbar-link">Home</a></li>
-            <li><a href="Jobseeker/profile.php" class="navbar-link">Profile</a></li>
           <?php endif; ?>
-          <?php if ($_SESSION['role'] == 'company'): ?>
+          <?php if ($isLoggedIn && $role == 'company'): ?>
             <li><a href="/" class="navbar-link active">Dashboard</a></li>
-            <li><a href="company/profile.php" class="navbar-link">Profile</a></li>
           <?php endif; ?>
         </ul>
       </div>
       <div class="navbar-user">
-        <span class="navbar-welcome">Welcome,</span>
-        <?php if ($_SESSION['role'] == 'job_seeker'): ?>
-          <span class="navbar-username"><?php echo $firstName; ?></span>
-        <?php endif; ?>
+        <?php if ($isLoggedIn): ?>
+          <span class="navbar-welcome">Welcome,</span>
+          <?php if ($role == 'job_seeker'): ?>
+            <span class="navbar-username"><?php echo $firstName; ?></span>
+          <?php endif; ?>
 
-        <?php if ($_SESSION['role'] == 'company'): ?>
-          <span class="navbar-username"><?php echo htmlspecialchars($job['company_name']); ?></span>
+          <?php if ($role == 'company'): ?>
+            <span class="navbar-username"><?php echo htmlspecialchars($job['company_name']); ?></span>
+          <?php endif; ?>
+          <a href="/auth/logout.php" class="navbar-btns">Sign Out</a>
+        <?php else: ?>
+          <span class="navbar-welcome">Welcome,</span>
+          <span class="navbar-username"><?php echo $firstName; ?></span>
+          <a href="/auth/login.php" class="navbar-btns">Login</a>
         <?php endif; ?>
-        <a href="/auth/logout.php" class="navbar-signout">Sign Out</a>
       </div>
     </nav>
   </header>
+
   <section class="breadcrumb">
     <p>
       <a href="/" class="">Home</a> /
@@ -89,6 +87,7 @@ if (mysqli_num_rows($result) > 0) {
       </a>
     </p>
   </section>
+
   <main>
     <section class="columns">
       <div class="column_1">
@@ -105,16 +104,22 @@ if (mysqli_num_rows($result) > 0) {
                 <?php echo $job["city"] ?>
               </p>
             </div>
-          </div>
-          <?php if ($_SESSION['role'] == 'job_seeker'): ?>
+          </div> <?php if ($isLoggedIn && $role == 'job_seeker'): ?>
             <div class="apply">
-              <a href="/lamaran.html">Apply Sekarang</a>
+              <a href="apply.php?id=<?php echo $id ?>">Apply Sekarang</a>
+            </div>
+          <?php elseif (!$isLoggedIn): ?>
+            <div class="apply">
+              <a href="../auth/login.php">Login to Apply</a>
             </div>
           <?php endif; ?>
 
-          <?php if ($_SESSION['role'] == 'company'): ?>
-            <div class="count">
-              <p>View Count: <?php echo $job["views_count"]; ?></p>
+          <?php if ($isLoggedIn && $role == 'company'): ?>
+            <div class="applicant">
+              <div class="count">
+                <i class="fas fa-user"></i>
+                0 applicant
+              </div>
             </div>
           <?php endif; ?>
         </div>
@@ -161,7 +166,7 @@ if (mysqli_num_rows($result) > 0) {
         </p>
         <p>Persyaratan:</p>
         <?php
-        $cleaned_requirements = str_replace(["\r", "\n"], '', $job["requirements"]);
+        $cleaned_requirements = str_replace(["\\r\\n", "\\r", "\\n", "\r\n", "\r", "\n"], '', $job["requirements"]);
         $items = array_filter(explode('• ', $cleaned_requirements));
         ?>
 

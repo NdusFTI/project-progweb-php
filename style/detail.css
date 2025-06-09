@@ -102,7 +102,7 @@ body {
   color: #222;
 }
 
-.navbar-signout {
+.navbar-btns {
   font-size: 14px;
   color: #0073b1;
   text-decoration: none;
@@ -112,7 +112,7 @@ body {
   transition: all 0.2s ease-in-out;
 }
 
-.navbar-signout:hover {
+.navbar-btns:hover {
   background-color: #0073b1;
   color: white;
 }
@@ -190,6 +190,29 @@ body {
 
 .apply {
   padding: 1rem 2rem 2rem 1rem;
+}
+
+.applicant {
+  padding: 1rem 2rem 2rem 1rem;
+}
+
+.count {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.6rem 1rem;
+  background: linear-gradient(135deg, #e3f2fd, #bbdefb);
+  border-radius: 8px;
+  font-weight: 600;
+  color: #1976d2;
+  font-size: 0.85rem;
+  min-width: fit-content;
+  white-space: nowrap;
+}
+
+.count .fas {
+  font-size: 0.9rem;
+  opacity: 0.8;
 }
 
 .details,

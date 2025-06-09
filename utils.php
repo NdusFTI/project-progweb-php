@@ -25,6 +25,22 @@ function getApplicantCountClass($count)
   return '';
 }
 
+// Detail
+function getDetailJobs($koneksi, $id)
+{
+  $query = "SELECT jp.*, c.*, jc.name as category_name 
+  FROM job_postings jp
+  INNER JOIN companies c ON jp.company_id = c.id 
+  INNER JOIN job_categories jc ON jp.category_id = jc.id 
+  WHERE jp.id = ?";
+
+  $stmt = mysqli_prepare($koneksi, $query);
+  mysqli_stmt_bind_param($stmt, "i", $id);
+  mysqli_stmt_execute($stmt);
+  $result = mysqli_stmt_get_result($stmt);
+  return $result;
+}
+
 // User
 function getCompanyByUserId($koneksi, $user_id)
 {
