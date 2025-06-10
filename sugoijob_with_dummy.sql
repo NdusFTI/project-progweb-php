@@ -162,10 +162,10 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `email`, `password`, `name`, `role`, `created_at`) VALUES
-(1, 'andi.wijaya@gmail.com', 'password123', 'Andi Wijaya', 'job_seeker', '2025-06-03 10:16:18'),
-(2, 'sari.dewi@gmail.com', 'password123', 'Sari Dewi', 'job_seeker', '2025-06-03 10:16:18'),
-(3, 'hr@tokopedia.com', 'tokopedia2025', 'PT Tokopedia', 'company', '2025-06-03 10:16:18'),
-(4, 'recruitment@gojek.com', 'gojek2025', 'PT Gojek Indonesia', 'company', '2025-06-03 10:16:18');
+(1, 'ndus@gmail.com', '123', 'Bernadus', 'job_seeker', '2025-06-03 10:16:18'),
+(2, 'ivan@gmail.com', '123', 'Ivan', 'job_seeker', '2025-06-03 10:16:18'),
+(3, 'hr@tokopedia.com', 'tokopedia', 'PT Tokopedia', 'company', '2025-06-03 10:16:18'),
+(4, 'hr@gojek.com', 'gojek', 'PT Gojek Indonesia', 'company', '2025-06-03 10:16:18');
 
 --
 -- Indexes for dumped tables
