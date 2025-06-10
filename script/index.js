@@ -27,6 +27,19 @@ function formatSalaryJS(salaryMin, salaryMax, salaryText) {
   }
 }
 
+function formatDateJS(string) {
+  if (!string) return '';
+  
+  const date = new Date(string);
+  const options = { 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric'
+  };
+  
+  return date.toLocaleDateString('id-ID', options);
+}
+
 function formatJobTypeJS(jobType) {
   if (!jobType) return [];
   return jobType.split(',').map(type => type.trim());
@@ -112,7 +125,7 @@ function showJobDetail(index) {
             <div class="type">
               <h1>Batas Lamaran</h1>
               <div class="tag">
-                <p>${new Date(job.application_deadline).toLocaleDateString('id-ID')}</p>
+                <p>${formatDateJS(job.application_deadline)}</p>
               </div>
             </div>
             ` : ''}
