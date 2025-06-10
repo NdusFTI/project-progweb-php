@@ -82,6 +82,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $portofolioPath = $uploadDir . $portofolioNewName;
     if (move_uploaded_file($portofolio['tmp_name'], $portofolioPath)) {
       $uploadMessages[] = 'Portofolio berhasil diunggah';
+    } else {
+      echo "<script>alert('Gagal mengunggah Portofolio.'); window.location.href = 'apply.php?id=$job_id';</script>";
+      exit();
     }
   }
 
@@ -91,6 +94,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $suratLamaranPath = $uploadDir . $suratLamaranNewName;
     if (move_uploaded_file($suratLamaran['tmp_name'], $suratLamaranPath)) {
       $uploadMessages[] = 'Surat Lamaran berhasil diunggah';
+    } else {
+      echo "<script>alert('Gagal mengunggah Surat Lamaran.'); window.location.href = 'apply.php?id=$job_id';</script>";
+      exit();
     }
   }
 
