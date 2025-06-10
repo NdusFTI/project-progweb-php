@@ -28,11 +28,15 @@ function getApplicantCountClass($count)
 // Detail
 function getDetailJobs($koneksi, $id)
 {
-  $query = "SELECT jp.*, c.*, jc.name as category_name 
-    FROM job_postings jp
-    INNER JOIN companies c ON jp.company_id = c.id 
-    INNER JOIN job_categories jc ON jp.category_id = jc.id 
-    WHERE jp.id = ?";
+  $query = "SELECT 
+    jp.*,
+    c.*,
+    jc.name as category_name,
+    (SELECT COUNT(*) FROM job_applications ja WHERE ja.job_id = jp.id) as applicant_count
+  FROM job_postings jp
+  INNER JOIN companies c ON jp.company_id = c.id 
+  INNER JOIN job_categories jc ON jp.category_id = jc.id 
+  WHERE jp.id = ?;";
 
   $stmt = mysqli_prepare($koneksi, $query);
   mysqli_stmt_bind_param($stmt, "i", $id);

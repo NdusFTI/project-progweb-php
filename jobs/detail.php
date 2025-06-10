@@ -118,7 +118,7 @@ if (mysqli_num_rows($result) > 0) {
             <div class="applicant">
               <div class="count">
                 <i class="fas fa-user"></i>
-                0 applicant
+                <?php echo $job['applicant_count']; ?> applicant<?php echo $job['applicant_count'] != 1 ? 's' : ''; ?>
               </div>
             </div>
           <?php endif; ?>
