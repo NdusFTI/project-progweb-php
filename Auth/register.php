@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
           <div class="input-group">
             <label for="email-job">Email</label>
-            <input type="text" id="email-job" name="email-job" required>
+            <input type="email" id="email-job" name="email-job" required>
           </div>
           <input type="text" value="job_seeker" id="role-job" name="role-job" hidden>
           <button type="submit">Buat Akun</button>
@@ -96,7 +96,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
           </div>
           <div class="input-group">
             <label for="email-company">Email</label>
-            <input type="text" id="email-company" name="email-company" required>
+            <input type="email" id="email-company" name="email-company" required>
           </div>
           <input type="text" value="company" id="role-company" name="role-company" hidden>
           <button type="submit">Buat Akun</button>
