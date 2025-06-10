@@ -69,7 +69,7 @@ if (mysqli_num_rows($result) > 0) {
           <?php if ($role == 'company'): ?>
             <span class="navbar-username"><?php echo htmlspecialchars($job['company_name']); ?></span>
           <?php endif; ?>
-          <a href="/auth/logout.php" class="navbar-btns">Sign Out</a>
+          <a href="/auth/logout.php" class="navbar-btns">Log Out</a>
         <?php else: ?>
           <span class="navbar-welcome">Welcome,</span>
           <span class="navbar-username"><?php echo $firstName; ?></span>

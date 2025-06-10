@@ -212,7 +212,7 @@ $userData = mysqli_fetch_assoc($userResult);
         <span class="navbar-username"><?php echo htmlspecialchars(
           $username
         ); ?></span>
-        <a href="/auth/logout.php" class="navbar-btns">Sign Out</a>
+        <a href="/auth/logout.php" class="navbar-btns">Log Out</a>
       </div>
     </nav>
   </header>
