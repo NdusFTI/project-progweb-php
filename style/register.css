@@ -206,6 +206,7 @@ button[type="submit"]:disabled {
   transform: none;
 }
 
+
 .error-message {
   background-color: #f8d7da;
   color: #721c24;

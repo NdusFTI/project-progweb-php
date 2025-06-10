@@ -4,11 +4,17 @@ include '../utils.php';
 session_start();
 
 $isLoggedIn = isset($_SESSION["user_id"]);
-$username = $isLoggedIn ? $_SESSION["username"] : "Guest";
-$user_id = $isLoggedIn ? $_SESSION["user_id"] : null;
-$role = $isLoggedIn ? $_SESSION["role"] : "job_seeker";
 
-$firstName = $isLoggedIn ? explode(" ", $username)[0] : "Guest";
+if (!$isLoggedIn) {
+  header("Location: /auth/login.php");
+  exit();
+}
+
+$username = $_SESSION["username"];
+$user_id = $_SESSION["user_id"];
+$role = $_SESSION["role"];
+
+$firstName = explode(" ", $username)[0];
 
 if (!isset($_GET['id'])) {
   header('Location: ../');
@@ -51,30 +57,24 @@ if (mysqli_num_rows($result) > 0) {
           <h2 class="navbar-brand">SugoiJob</h2>
         </div>
         <ul class="navbar-links">
-          <?php if (!$isLoggedIn || $role == 'job_seeker'): ?>
+          <?php if ($role == 'job_seeker'): ?>
             <li><a href="/" class="navbar-link">Home</a></li>
           <?php endif; ?>
-          <?php if ($isLoggedIn && $role == 'company'): ?>
+          <?php if ($role == 'company'): ?>
             <li><a href="/" class="navbar-link active">Dashboard</a></li>
           <?php endif; ?>
         </ul>
       </div>
       <div class="navbar-user">
-        <?php if ($isLoggedIn): ?>
-          <span class="navbar-welcome">Welcome,</span>
-          <?php if ($role == 'job_seeker'): ?>
-            <span class="navbar-username"><?php echo $firstName; ?></span>
-          <?php endif; ?>
-
-          <?php if ($role == 'company'): ?>
-            <span class="navbar-username"><?php echo htmlspecialchars($job['company_name']); ?></span>
-          <?php endif; ?>
-          <a href="/auth/logout.php" class="navbar-btns">Log Out</a>
-        <?php else: ?>
-          <span class="navbar-welcome">Welcome,</span>
+        <span class="navbar-welcome">Welcome,</span>
+        <?php if ($role == 'job_seeker'): ?>
           <span class="navbar-username"><?php echo $firstName; ?></span>
-          <a href="/auth/login.php" class="navbar-btns">Login</a>
         <?php endif; ?>
+
+        <?php if ($role == 'company'): ?>
+          <span class="navbar-username"><?php echo htmlspecialchars($job['company_name']); ?></span>
+        <?php endif; ?>
+        <a href="/auth/logout.php" class="navbar-btns">Log Out</a>
       </div>
     </nav>
   </header>
@@ -104,17 +104,13 @@ if (mysqli_num_rows($result) > 0) {
                 <?php echo $job["city"] ?>
               </p>
             </div>
-          </div> <?php if ($isLoggedIn && $role == 'job_seeker'): ?>
+          </div>
+          <?php if ($role == 'job_seeker'): ?>
             <div class="apply">
               <a href="apply.php?id=<?php echo $id ?>">Apply Sekarang</a>
             </div>
-          <?php elseif (!$isLoggedIn): ?>
-            <div class="apply">
-              <a href="../auth/login.php">Login to Apply</a>
-            </div>
           <?php endif; ?>
-
-          <?php if ($isLoggedIn && $role == 'company'): ?>
+          <?php if ($role == 'company'): ?>
             <div class="applicant">
               <div class="count">
                 <i class="fas fa-user"></i>
