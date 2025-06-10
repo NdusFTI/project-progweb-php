@@ -120,9 +120,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tanggalLahir,
     $email,
     $nomorHp,
-    $cvNewName,
-    $portofolioNewName,
-    $suratLamaranNewName
+    $cvPath,
+    $portofolioPath,
+    $suratLamaranPath
   );
 
   if (mysqli_stmt_execute($insertStmt)) {
