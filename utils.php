@@ -29,10 +29,10 @@ function getApplicantCountClass($count)
 function getDetailJobs($koneksi, $id)
 {
   $query = "SELECT jp.*, c.*, jc.name as category_name 
-  FROM job_postings jp
-  INNER JOIN companies c ON jp.company_id = c.id 
-  INNER JOIN job_categories jc ON jp.category_id = jc.id 
-  WHERE jp.id = ?";
+    FROM job_postings jp
+    INNER JOIN companies c ON jp.company_id = c.id 
+    INNER JOIN job_categories jc ON jp.category_id = jc.id 
+    WHERE jp.id = ?";
 
   $stmt = mysqli_prepare($koneksi, $query);
   mysqli_stmt_bind_param($stmt, "i", $id);
@@ -74,10 +74,10 @@ function getJobsWithFilters($koneksi, $keyword = '', $location = '', $job_type =
       jcat.name as category_name,
       jp.is_active,
       jp.created_at
-      FROM job_postings jp
-      JOIN companies c ON jp.company_id = c.id
-      JOIN job_categories jcat ON jp.category_id = jcat.id
-      WHERE jp.is_active = 1";
+    FROM job_postings jp
+    JOIN companies c ON jp.company_id = c.id
+    JOIN job_categories jcat ON jp.category_id = jcat.id
+    WHERE jp.is_active = 1";
 
   $params = [];
   $types = '';
@@ -184,7 +184,8 @@ function isPriority($created_at)
 
 function getAllCompanyName($koneksi)
 {
-  $sql = "SELECT DISTINCT company_name FROM companies ORDER BY company_name ASC";
+  $sql = "SELECT DISTINCT company_name FROM companies 
+    ORDER BY company_name ASC";
   $stmt = $koneksi->prepare($sql);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -193,7 +194,9 @@ function getAllCompanyName($koneksi)
 
 function getAllJobLocation($koneksi)
 {
-  $sql = "SELECT DISTINCT location FROM job_postings WHERE location IS NOT NULL AND location != '' ORDER BY location ASC";
+  $sql = "SELECT DISTINCT location FROM job_postings 
+    WHERE location IS NOT NULL AND location != '' 
+    ORDER BY location ASC";
   $stmt = $koneksi->prepare($sql);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -202,7 +205,9 @@ function getAllJobLocation($koneksi)
 
 function getAllJobTypes($koneksi)
 {
-  $sql = "SELECT DISTINCT job_type FROM job_postings WHERE job_type IS NOT NULL AND job_type != '' ORDER BY job_type ASC";
+  $sql = "SELECT DISTINCT job_type FROM job_postings 
+    WHERE job_type IS NOT NULL AND job_type != '' 
+    ORDER BY job_type ASC";
   $stmt = $koneksi->prepare($sql);
   $stmt->execute();
   $result = $stmt->get_result();
@@ -264,7 +269,8 @@ function getJobsByCompanyId($koneksi, $company_id)
 
 function getTotalJobsByCompanyId($koneksi, $company_id)
 {
-  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ?";
+  $sql = "SELECT COUNT(*) as total FROM job_postings 
+    WHERE company_id = ?";
   $stmt = $koneksi->prepare($sql);
   $stmt->bind_param("i", $company_id);
   $stmt->execute();
@@ -275,7 +281,8 @@ function getTotalJobsByCompanyId($koneksi, $company_id)
 
 function getRecentJobsCountById($koneksi, $company_id, $days = 7)
 {
-  $sql = "SELECT COUNT(*) as total FROM job_postings WHERE company_id = ? AND created_at >= NOW() - INTERVAL ? DAY";
+  $sql = "SELECT COUNT(*) as total FROM job_postings 
+    WHERE company_id = ? AND created_at >= NOW() - INTERVAL ? DAY";
   $stmt = $koneksi->prepare($sql);
   $stmt->bind_param("ii", $company_id, $days);
   $stmt->execute();
@@ -298,8 +305,8 @@ function getActiveJobsCountById($koneksi, $company_id)
 function getTotalApplicantsByCompanyId($koneksi, $company_id)
 {
   $sql = "SELECT COUNT(DISTINCT ja.applicant_id) as total FROM job_applications ja
-          JOIN job_postings jp ON ja.job_id = jp.id
-          WHERE jp.company_id = ? AND jp.is_active = 1";
+    JOIN job_postings jp ON ja.job_id = jp.id
+    WHERE jp.company_id = ? AND jp.is_active = 1";
   $stmt = $koneksi->prepare($sql);
   $stmt->bind_param("i", $company_id);
   $stmt->execute();
@@ -310,12 +317,40 @@ function getTotalApplicantsByCompanyId($koneksi, $company_id)
 
 function getTotalViewsByCompanyId($koneksi, $company_id)
 {
-  $sql = "SELECT SUM(views_count) as total FROM job_postings WHERE company_id = ? AND is_active = 1";
+  $sql = "SELECT SUM(views_count) as total FROM job_postings 
+    WHERE company_id = ? AND is_active = 1";
   $stmt = $koneksi->prepare($sql);
   $stmt->bind_param("i", $company_id);
   $stmt->execute();
   $result = $stmt->get_result();
   $row = $result->fetch_assoc();
   return $row['total'];
+}
+
+// Validation
+function validateFile($file, $fileName, $isRequired = true)
+{
+  if (!$isRequired && (!isset($file) || $file === null || $file["error"] === UPLOAD_ERR_NO_FILE)) {
+    return true;
+  }
+
+  if ($isRequired && (!isset($file) || $file === null || $file["error"] === UPLOAD_ERR_NO_FILE)) {
+    return "File $fileName wajib diunggah.";
+  }
+
+  if ($file["error"] !== UPLOAD_ERR_OK) {
+    return "Gagal mengunggah $fileName. Silakan coba lagi.";
+  }
+
+  if ($file["size"] > 5 * 1024 * 1024) {
+    return "Ukuran $fileName terlalu besar. Maksimal 5MB.";
+  }
+
+  $allowedTypes = ['application/pdf', 'application/msword', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'];
+  if (!in_array($file["type"], $allowedTypes)) {
+    return "$fileName harus berformat PDF atau Word.";
+  }
+
+  return true;
 }
 ?>

@@ -18,18 +18,127 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
   $portofolio = $_FILES["portofolio"] ?? null;
   $suratLamaran = $_FILES["surat-lamaran"] ?? null;
   $user_id = $_SESSION["user_id"];
-  
-  // Validasi file CV
-  if ($cv["error"] !== UPLOAD_ERR_OK) {
-    echo "<script>alert('Gagal mengunggah CV. Silakan coba lagi.'); window.location.href = 'apply.php?id=$job_id';</script>";
+
+  $files_to_validate = [
+    'CV' => $cv,
+    'Portofolio' => $portofolio,
+    'Surat Lamaran' => $suratLamaran
+  ];
+
+  $validationErrors = [];
+
+  $cvValidation = validateFile($cv, 'CV', true);
+  if ($cvValidation !== true) {
+    $validationErrors[] = $cvValidation;
+  }
+
+  $portofolioValidation = validateFile($portofolio, 'Portofolio', false);
+  if ($portofolioValidation !== true) {
+    $validationErrors[] = $portofolioValidation;
+  }
+
+  $suratLamaranValidation = validateFile($suratLamaran, 'Surat Lamaran', false);
+  if ($suratLamaranValidation !== true) {
+    $validationErrors[] = $suratLamaranValidation;
+  }
+
+  if (!empty($validationErrors)) {
+    $errorMessage = implode('\\n', $validationErrors);
+    echo "<script>alert('$errorMessage'); window.location.href = 'apply.php?id=$job_id';</script>";
     exit();
   }
 
-  // Validasi ukuran file CV
-  if ($cv["size"] > 5 * 1024 * 1024) {
-    echo "<script>alert('Ukuran CV terlalu besar. Maksimal 5MB.'); window.location.href = 'apply.php?id=$job_id';</script>";
+  $uploadDir = 'uploads/applications/';
+  if (!is_dir($uploadDir)) {
+    mkdir($uploadDir, 0777, true);
+  }
+
+  $timestamp = time();
+
+  $cvNewName = null;
+  $portofolioNewName = null;
+  $suratLamaranNewName = null;
+
+  $uploadMessages = [];
+
+  // Upload CV (required)
+  if ($cv && $cv['error'] === UPLOAD_ERR_OK) {
+    $cvNewName = $user_id . '_' . $job_id . '_cv_' . $timestamp . '.' . pathinfo($cv['name'], PATHINFO_EXTENSION);
+    $cvPath = $uploadDir . $cvNewName;
+    if (move_uploaded_file($cv['tmp_name'], $cvPath)) {
+      $uploadMessages[] = 'CV berhasil diunggah';
+    } else {
+      echo "<script>alert('Gagal mengunggah CV.'); window.location.href = 'apply.php?id=$job_id';</script>";
+      exit();
+    }
+  } else {
+    echo "<script>alert('CV wajib diunggah.'); window.location.href = 'apply.php?id=$job_id';</script>";
     exit();
   }
+
+  // Upload Portfolio (optional)
+  if ($portofolio && $portofolio['error'] === UPLOAD_ERR_OK) {
+    $portofolioNewName = $user_id . '_' . $job_id . '_portofolio_' . $timestamp . '.' . pathinfo($portofolio['name'], PATHINFO_EXTENSION);
+    $portofolioPath = $uploadDir . $portofolioNewName;
+    if (move_uploaded_file($portofolio['tmp_name'], $portofolioPath)) {
+      $uploadMessages[] = 'Portofolio berhasil diunggah';
+    }
+  }
+
+  // Upload Cover Letter (optional)
+  if ($suratLamaran && $suratLamaran['error'] === UPLOAD_ERR_OK) {
+    $suratLamaranNewName = $user_id . '_' . $job_id . '_surat_' . $timestamp . '.' . pathinfo($suratLamaran['name'], PATHINFO_EXTENSION);
+    $suratLamaranPath = $uploadDir . $suratLamaranNewName;
+    if (move_uploaded_file($suratLamaran['tmp_name'], $suratLamaranPath)) {
+      $uploadMessages[] = 'Surat Lamaran berhasil diunggah';
+    }
+  }
+
+  // Insert application data
+  $insertQuery = "INSERT INTO job_applications (
+    job_id, 
+    applicant_id, 
+    full_name, 
+    birth_date, 
+    email, 
+    phone, 
+    cv_file, 
+    portfolio_file, 
+    cover_letter_file, 
+    status, 
+    applied_at
+  ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 'pending', NOW())";
+
+  $insertStmt = mysqli_prepare($koneksi, $insertQuery);
+
+  mysqli_stmt_bind_param(
+    $insertStmt,
+    "iisssssss",
+    $job_id,
+    $user_id,
+    $namaLengkap,
+    $tanggalLahir,
+    $email,
+    $nomorHp,
+    $cvNewName,
+    $portofolioNewName,
+    $suratLamaranNewName
+  );
+
+  if (mysqli_stmt_execute($insertStmt)) {
+    if (mysqli_stmt_affected_rows($insertStmt) > 0) {
+      $allMessages = implode(', ', $uploadMessages);
+      $successMessage = $allMessages . '. Lamaran berhasil dikirim!';
+      echo "<script>alert('$successMessage'); window.location.href = 'detail.php?id=$job_id';</script>";
+    } else {
+      echo "<script>alert('Gagal mengirim lamaran. Silakan coba lagi.'); window.location.href = 'apply.php?id=$job_id';</script>";
+    }
+  } else {
+    echo "<script>alert('Terjadi kesalahan database. Silakan coba lagi.'); window.location.href = 'apply.php?id=$job_id';</script>";
+  }
+
+  mysqli_stmt_close($insertStmt);
+  exit();
 }
 
 $username = $_SESSION["username"];
@@ -46,11 +155,20 @@ if (!isset($_GET["id"])) {
 $id = $_GET["id"];
 $result = getDetailJobs($koneksi, $id);
 
+$checkQuery = "SELECT id FROM job_applications WHERE job_id = ? AND applicant_id = ?";
+$checkStmt = mysqli_prepare($koneksi, $checkQuery);
+mysqli_stmt_bind_param($checkStmt, "ii", $id, $user_id);
+mysqli_stmt_execute($checkStmt);
+$checkResult = mysqli_stmt_get_result($checkStmt);
+if (mysqli_num_rows($checkResult) > 0) {
+  echo "<script>alert('Anda sudah mengajukan lamaran untuk pekerjaan ini.'); window.location.href = 'detail.php?id=$id';</script>";
+  exit();
+}
+
 if (mysqli_num_rows($result) > 0) {
   $job = mysqli_fetch_assoc($result);
 
-  $updateQuery =
-    "UPDATE job_postings SET views_count = views_count + 1 WHERE id = ?";
+  $updateQuery = "UPDATE job_postings SET views_count = views_count + 1 WHERE id = ?";
   $updateStmt = mysqli_prepare($koneksi, $updateQuery);
   mysqli_stmt_bind_param($updateStmt, "i", $id);
   mysqli_stmt_execute($updateStmt);
@@ -65,19 +183,6 @@ mysqli_stmt_bind_param($userStmt, "i", $user_id);
 mysqli_stmt_execute($userStmt);
 $userResult = mysqli_stmt_get_result($userStmt);
 $userData = mysqli_fetch_assoc($userResult);
-
-$checkQuery =
-  "SELECT id FROM job_applications WHERE job_id = ? AND applicant_id = ?";
-$checkStmt = mysqli_prepare($koneksi, $checkQuery);
-mysqli_stmt_bind_param($checkStmt, "ii", $id, $user_id);
-mysqli_stmt_execute($checkStmt);
-$checkResult = mysqli_stmt_get_result($checkStmt);
-$alreadyApplied = mysqli_num_rows($checkResult) > 0;
-
-if ($alreadyApplied) {
-  echo "<script>alert('Anda sudah mengajukan lamaran untuk pekerjaan ini.'); window.location.href = 'detail.php?id=$id';</script>";
-  exit();
-}
 ?>
 
 <!DOCTYPE html>
@@ -107,7 +212,7 @@ if ($alreadyApplied) {
         <span class="navbar-username"><?php echo htmlspecialchars(
           $username
         ); ?></span>
-        <a href="Auth/logout.php" class="navbar-btns">Sign Out</a>
+        <a href="/auth/logout.php" class="navbar-btns">Sign Out</a>
       </div>
     </nav>
   </header>
