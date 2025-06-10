@@ -210,7 +210,7 @@ $userData = mysqli_fetch_assoc($userResult);
           <h2 class="navbar-brand">SugoiJob</h2>
         </div>
         <ul class="navbar-links">
-          <li><a href="index.php" class="navbar-link">Home</a></li>
+          <li><a href="/" class="navbar-link">Home</a></li>
         </ul>
       </div>
       <div class="navbar-user">

@@ -442,7 +442,7 @@ if ($role == 'company') {
               </div>
               <h3>No Job Postings Yet</h3>
               <p>Start by posting your first job to attract talented candidates.</p>
-              <a href="add-job.php" class="add-job-btn">
+              <a href="company/addjob.php" class="add-job-btn">
                 <i class="fas fa-plus"></i>
                 Post Your First Job
               </a>
