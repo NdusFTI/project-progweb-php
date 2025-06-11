@@ -187,11 +187,11 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             <label>Salary Information <span class="required">*</span></label>
             <div class="salary-inputs">
               <div>
-                <input type="number" id="salary_min" name="salary_min" required placeholder="Min Salary" min="0" />
+                <input type="number" id="salary_min" name="salary_min" required placeholder="Min Salary" min="0" step="100000" />
               </div>
               <div class="salary-separator">to</div>
               <div>
-                <input type="number" id="salary_max" name="salary_max" required placeholder="Max Salary" min="0" />
+                <input type="number" id="salary_max" name="salary_max" required placeholder="Max Salary" min="0" step="100000" />
               </div>
             </div>
           </div>
